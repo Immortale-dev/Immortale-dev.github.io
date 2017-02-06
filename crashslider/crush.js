@@ -472,20 +472,31 @@ CrashSlider.prototype.displayCrush = function(custScrollTop,custScrollLeft){
 				//ctx.fillStyle = "black";
 			}
 			
-
+			var hhx,hhy,nhx,nhy;
 			
-			ctx.drawImage(crIm,
-				arrq[m][n][0][0]*cIW, 
-				arrq[m][n][0][1]*cIH, 
-				(arrq[m][n][2][0] - arrq[m][n][0][0])*cIW,
-				(arrq[m][n][2][1] - arrq[m][n][0][1])*cIH, 
-				(-(arrq[m][n][2][0]-arrq[m][n][0][0])/2), 
-				(-(arrq[m][n][2][1]-arrq[m][n][0][1])/2),
-				arrq[m][n][2][0] - arrq[m][n][0][0],
-				arrq[m][n][2][1] - arrq[m][n][0][1]
-			);
+			hhx = Math.round(arrq[m][n][2][0] - arrq[m][n][0][0])*cIW;
+			hhy = Math.round(arrq[m][n][2][1] - arrq[m][n][0][1])*cIH;
+			nhx = Math.round(arrq[m][n][2][0] - arrq[m][n][0][0]);
+			nhy = Math.round(arrq[m][n][2][1] - arrq[m][n][0][1]);
 			
+			if(hhx == 0 || hhy == 0 || nhx == 0 || nhy == 0)
+			{
+				
+			}
+			else{
 			
+				ctx.drawImage(crIm,
+					Math.round(arrq[m][n][0][0]*cIW), 
+					Math.round(arrq[m][n][0][1]*cIH), 
+					Math.round((arrq[m][n][2][0] - arrq[m][n][0][0])*cIW),
+					Math.round((arrq[m][n][2][1] - arrq[m][n][0][1])*cIH), 
+					Math.round((-(arrq[m][n][2][0]-arrq[m][n][0][0])/2)), 
+					Math.round((-(arrq[m][n][2][1]-arrq[m][n][0][1])/2)),
+					Math.round(arrq[m][n][2][0] - arrq[m][n][0][0]),
+					Math.round(arrq[m][n][2][1] - arrq[m][n][0][1])
+				);
+				
+			}
 			
 			
 			
