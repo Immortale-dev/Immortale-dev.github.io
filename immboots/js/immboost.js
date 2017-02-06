@@ -774,7 +774,7 @@ sels.prototype.activate = function(){
 		
 		
 		
-		var limit = dataCount;
+		/*var limit = dataCount;
 		var elC = this.children[1].children[0].children.length;
 		
 		if(elC<limit)
@@ -782,7 +782,7 @@ sels.prototype.activate = function(){
 		//console.log(absH+" "+(absY + (limit+1)*50));
 		if(absY + (limit+1)*50 > absH){
 			this.classList.add('inverted');
-		}
+		}*/
 		
 		self._updateInterval = setInterval(function(){ self.resized(); },500);
 		
