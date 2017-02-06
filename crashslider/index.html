@@ -1,0 +1,160 @@
+<style>
+
+body{
+	margin: 0;
+}
+
+</style>
+
+<script src="crush.js"></script>
+
+<script>
+
+//var  iii = 0;
+
+function initSlider(){
+
+	
+
+	document.getElementById('tst').onclick = clickSlider;
+	document.getElementById('tst2').onclick = clickSlider;
+	document.getElementById('tst3').onclick = clickSlider;
+	document.getElementById('tst4').onclick = clickSlider;
+	
+	
+	var allCrashes = [];
+	
+	document.getElementById("revers").onclick  = function(){
+		for(var i=0;i<allCrashes.length;i++){
+			allCrashes[i].slowMo *= -1;
+			//allCrashes[i].slowMo /=2;
+		}
+	}
+	
+	function clickSlider(event){
+		var animationStartTime;
+		var crash;
+		event = event || window.event;
+		crash = new CrashSlider(this.id);
+		
+		crash.fadeLow = 0.1;
+		crash.fadeHigh = 0.8;
+		crash.deathByUpDown = 0;
+		crash.deathByLeftRight = 0;
+		crash.slowMo = 1;
+		allCrashes.push(crash);
+		crash.grav = 0.2;
+		
+		var self = this;
+		
+		var poss = crash.makeCanvas(crash.crushImg);
+		
+		var img = new Image();
+		img.src = crash.crushImg.src;
+		img.onload = function(){
+			var realIW = this.width;
+			var realIH = this.height;
+			crash.setRealWH(realIW,realIH);
+			
+			var x = event.pageX;
+			var y = event.pageY;
+			
+			
+			var posO = absPos(self);
+			
+			var rX = x-posO.x;
+			var rY = y-posO.y;
+			
+			console.log(x,y);
+			crash.crashPlane(crash.crushImg,{type:1,density:1,pos:{x:rX,y:rY},vector:8,spin:15,startLength:15,sideCount:22,multCoof:1.45});
+			crash.crushImg.style.visibility = 'hidden';
+			animationStartTime =  window.performance.now();
+			rend();
+		}
+		
+		function rend(s){
+			var TT = s-animationStartTime;
+			
+			crash.clearRect();
+			crash.physPlane(crash.grav,TT);
+			crash.displayCrush();
+			
+			
+			animationStartTime = s;
+			if(!crash.crushDead){
+				requestAnimationFrame(rend);
+			}
+			else{
+				crash.nc.parentNode.removeChild(crash.nc);
+				crash = null;
+			}
+			
+			/*crash.slowMo *= 1.1;
+			if(crash.slowMo > 100){
+				crash.slowMo = 100;
+			}
+			if(crash.slowMo < -100){
+				crash.slowMo = -100;
+			}*/
+		};
+	}
+
+
+}
+
+function absPos(el){
+	var x=0,y=0;
+	do{
+		x+=el.offsetLeft;
+		y+=el.offsetTop;
+	}
+	while(el = el.offsetParent);
+	return {x:x,y:y};
+}
+
+addEventListener('load',initSlider,false);
+
+
+</script>
+
+<div id="testt" style="width: 20px; height: 20px; position: absolute; top: 0; left: 0; border-radius: 50%; margin-left: -10px; margin-top: -10px; background: red;"></div>
+<div style="position: relative; width: 960px; margin: 0 auto;">
+
+
+<div style="position: relative; float:left; width: 100%; margin-top: 100px;">
+
+
+
+<img id="tst" style="width: 49%;" src = "images/1.jpeg">
+<img id="tst2" style="width: 49%;" src = "images/2.jpeg">
+<img id="tst3" style="width: 49%;" src = "images/2.jpeg">
+<img id="tst4" style="width: 49%;" src = "images/1.jpeg">
+</div>
+<!--<button id="revers">revers</button>-->
+<!--<button onclick = "initSlider()">GO</button>-->
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+
+
+
+
+
+</div>

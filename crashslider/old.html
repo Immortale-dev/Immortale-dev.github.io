@@ -1,0 +1,1000 @@
+<style>
+
+body{
+	margin: 0;
+}
+
+</style>
+
+<script>
+
+var  iii = 0;
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+var CrashSlider = function(id){
+	
+	this.crushImg = document.getElementById(id);
+	
+	this.nc = null;
+	
+	//CORE VERTS
+	this.arp = null;
+	
+	//GROUND VERTS
+	this.arg = null;
+	
+	//FORCES
+	this.ars = null;
+	
+	//CORE BASE
+	this.arb = null;
+	
+	//PERSPECTIVE VERTS
+	this.arv = null;
+	
+	//GROUND BASE
+	this.arq = null;
+	
+	//FORCES SAVED
+	this.ark = null;
+	
+	this.cameraZ = -100;
+	this.cameraF = 100;
+	this.grav = 2;
+	
+}
+
+var superParent = CrashSlider.prototype;
+
+superParent.grav = 0.2;
+
+superParent.cameraZ = -8000;
+superParent.cameraF = 8000;
+
+
+CrashSlider.prototype.getDenensions = function(el){
+	
+	var top = 0,left = 0,w = 0, h = 0;
+
+	
+	w = el.offsetWidth;
+	h = el.offsetHeight;
+	
+	do{
+		top += el.offsetTop;
+		left += el.offsetLeft;
+	}while(el = el.offsetParent);
+
+	
+	return {x:left,y:top,width:w,height:h};
+	
+}
+
+CrashSlider.prototype.physPlane = function(gravity,pow,pers){
+	
+	
+	
+	var arr = superParent.arp;
+	var arrs = superParent.ars;
+	var arrc = superParent.arc;
+	var arrv = superParent.arv;
+	var arrg = superParent.arg;
+	
+	
+	var ccX = superParent.nc.width/2;
+	var ccY = superParent.nc.height/2;
+	//console.log(222);
+	
+	
+	
+	
+	for(var i=0;i<arr.length;i++){
+		for(var j=0;j<arr[i].length;j++){
+			for(var k=0;k<arr[i][j].length;k++){
+				
+				
+				
+				var realP = superParent.calc.position(arr[i][j][k],superParent.calc.reverse(arrs[i][j].center));
+				
+				
+				
+				
+				realP = superParent.calc.rotate.x(realP,arrs[i][j].spin);
+				realP = superParent.calc.rotate.y(realP,arrs[i][j].spin);
+				realP = superParent.calc.rotate.z(realP,arrs[i][j].spin);
+				
+				realP = superParent.calc.position(realP,arrs[i][j].center);
+				
+				
+				
+				realP = superParent.calc.position(realP,arrs[i][j].vector);
+				
+				
+				
+				
+				
+				
+				//console.log(superParent.grav);
+				
+				arr[i][j][k] = realP.slice(0);
+				
+				realP = superParent.calc.position(realP,[-ccX,-ccY,0]);
+				realP = superParent.perspective(realP);
+				arrv[i][j][k] = superParent.calc.position(realP,[ccX,ccY,0]);
+				// = realP
+				
+				/*
+				console.log(2);
+				console.log(arrv[i][j][k]);
+				console.log(-2);*/
+			}
+			
+			
+			for(var k=0;k<arrg[i][j].length;k++){
+				
+				
+				
+				var realP = superParent.calc.position(arrg[i][j][k],superParent.calc.reverse(arrs[i][j].center));
+				
+				realP = superParent.calc.rotate.x(realP,arrs[i][j].spin);
+				realP = superParent.calc.rotate.y(realP,arrs[i][j].spin);
+				realP = superParent.calc.rotate.z(realP,arrs[i][j].spin);
+				
+				realP = superParent.calc.position(realP,arrs[i][j].center);
+				
+				realP = superParent.calc.position(realP,arrs[i][j].vector);
+				//arrs[i][j].center = superParent.calc.position(arrs[i][j].center,arrs[i][j].vector);
+				
+				
+				//arrs[i][j].vector[1] = parseFloat(arrs[i][j].vector[1]) + parseFloat(superParent.grav);
+				
+				//console.log(superParent.grav);
+				
+				arrg[i][j][k] = realP;
+				
+				//realP = superParent.calc.position(realP,[-ccX,-ccY,0]);
+				//realP = superParent.perspective(realP);
+				//arrv[i][j][k] = superParent.calc.position(realP,[ccX,ccY,0]);
+				// = realP
+				
+				
+				
+				//arrs[i][j].vector[1] = parseFloat(arrs[i][j].vector[1]) + parseFloat(superParent.grav);
+				
+				/*
+				console.log(2);
+				console.log(arrv[i][j][k]);
+				console.log(-2);*/
+			}
+			arrs[i][j].center = superParent.calc.position(arrs[i][j].center,arrs[i][j].vector);
+			arrs[i][j].vector[1] = parseFloat(arrs[i][j].vector[1]) + parseFloat(superParent.grav);
+			
+			
+		}
+	}
+	
+	
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////PERSPECTIVE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+///////////////////////////////////////////////////////////////////////////////////////////
+
+CrashSlider.prototype.perspective = function(p) {
+	
+	var cameraZ = superParent.cameraZ;
+	var cameraF = superParent.cameraF;
+	
+	var coof = cameraF/cameraZ;
+	return [
+		p[0] * ((cameraF-cameraZ) / ((cameraF-cameraZ) - p[2])) * -coof * 1/*zoom*/,
+		p[1] * ((cameraF-cameraZ) / ((cameraF-cameraZ) - p[2])) * -coof * 1/*zoom*/,
+		p[2] * ((cameraF-cameraZ) / ((cameraF-cameraZ) - p[2])) * -coof * 1/*zoom*/
+		//p : ((cameraF-cameraZ) / ((cameraF-cameraZ) - p.z)) * 1/*zoom*/
+	]
+}
+
+
+CrashSlider.prototype.calcAng = function(obj1,obj2,isz,isx){
+	
+	var x1 = parseFloat(obj1[0]);
+	var x2 = parseFloat(obj2[0]);
+	var y1 = parseFloat(obj1[1]);
+	var y2 = parseFloat(obj2[1]);
+	
+	var zn = y1*y2;
+	var mz = 1;
+	
+	//alert(zn);
+	
+	
+	
+	
+	var angl = (Math.abs(x1)*Math.abs(x2)+Math.abs(y1)*Math.abs(y2))/(Math.sqrt(Math.pow(x1,2)+Math.pow(y1,2))*Math.sqrt(Math.pow(x2,2)+Math.pow(y2,2)));
+	
+	angl = Math.acos(angl);
+
+	
+	if(isz){
+	
+		if(x1<=0){
+			angl = (Math.PI/2 - angl) + Math.PI/2;
+		}
+	
+		if(y1<0){
+			angl = -angl;
+			//angl += Math.PI;
+		}
+	
+	}
+	if(isx){
+
+		if(x1 >= 0){
+			if(x2 <= 0){
+				
+				angl = ((Math.PI/2) - angl) + Math.PI/2;
+			}
+		
+			
+		}
+		else{
+		
+			if(x2 <= 0){
+				
+				angl = -angle;
+			}
+			else{
+				angl = -((Math.PI/2) - angl) + Math.PI/2;
+			}
+			
+			
+			
+		}
+		
+		if(y2 < 0){
+			angl = ((Math.PI/2) - angl) + Math.PI/2;
+		}
+	}
+	return angl;
+}
+
+
+CrashSlider.prototype.displayCrush = function(el){
+	
+	//alert(el.offsetWidth);
+	
+	var arr = superParent.arp; //arp
+	var arrg = superParent.arg;
+	var arrs = superParent.ars;
+	var arrq = superParent.arq;
+	var ctx = superParent.nc.getContext("2d");
+	
+	var crIm = document.getElementById("tst");
+	
+	//alert(superParent.crushImg.id);
+	//console.log(superParent);
+	
+	//var dems = superParent.getDenensions(this.crushImg);
+	//var arrv = superParent.arv;
+	
+	//arr = arrv;
+	var nccX = superParent.nc.width;
+	var nccY = superParent.nc.height;
+	
+	var ncl = (nccX - 960)/2;	//////////////FUCK THIS
+	
+	
+	
+	
+	
+	
+	for(var m=0;m<arr.length;m++){
+		
+		
+		
+		for(var n=0;n<arr[m].length;n++){
+			
+			
+			ctx.save();
+			ctx.strokeStyle="#000000";
+			ctx.beginPath();
+			for(var l=0;l<arr[m][n].length;l++){
+				
+				if(l === 0){
+					ctx.moveTo(arr[m][n][l][0],arr[m][n][l][1]);
+					//console.log(arr[m][n][l][0]+' '+arr[m][n][l][1]);
+				}
+				else{
+					ctx.lineTo(arr[m][n][l][0],arr[m][n][l][1]);
+					//console.log(arr[m][n][l][0]+' '+arr[m][n][l][1]);
+				}
+				
+			}
+			//console.log('_______________');
+			
+			ctx.closePath();
+			//****ctx.stroke();
+			
+			
+			ctx.clip();
+			
+			
+			//ctx.rotate(Math.PI/2);
+			
+			
+			//var newTrValX = arrq[m][n][0][0]+(arrs[m][n].center[0] - ((arrq[m][n][2][0] - arrq[m][n][0][0])/2 + arrq[m][n][0][0]));
+			//var newTrValY = arrq[m][n][0][1] + (arrs[m][n].center[1] - ((arrq[m][n][2][1] - arrq[m][n][0][1])/2 + arrq[m][n][0][1]));
+			var newTrValX = arrs[m][n].center[0];
+			var newTrValY = arrs[m][n].center[1];
+			
+			
+			///ctx.setTransform(Math.cos((arrs[m][n].spin[1]) * iii / (180/Math.PI)),0,0,Math.cos(arrs[m][n].spin[0] * iii / (180/Math.PI)),newTrValX,newTrValY);
+			
+			var lnn = [arrg[m][n][2][0] - arrg[m][n][3][0],arrg[m][n][2][1] - arrg[m][n][3][1]];
+			//console.log(lnn);
+			
+			var ang = superParent.calcAng(lnn,[1000,0],true);
+		
+	
+			
+			
+			
+			//console.log(ang);
+
+			
+			ctx.translate(newTrValX,newTrValY);
+			
+			if(ang){
+				
+				
+				///FUCK ON THIS SECTION
+				
+				
+				
+				ctx.rotate(ang);
+				
+				var skPt1 = arrg[m][n][2].slice(0);
+				
+				var skPt2 = arrg[m][n][3].slice(0);
+				
+				var skPt3 = arrg[m][n][0].slice(0);
+				
+				
+				skPt1[2] = 0;
+				skPt2[2] = 0;
+				skPt3[2] = 0;
+				
+				
+				
+				var skC1 = arrs[m][n].center.slice(0);
+				
+				skC1[2] = 0;
+				
+				//skC1 = superParent.calc.reverse(skC1);
+				
+				//console.log(skC1);
+				
+				ang *= (180/Math.PI);
+				
+				
+				skPt1 = superParent.calc.position(skPt1,superParent.calc.reverse(skC1));			
+				skPt1 = superParent.calc.rotate.z(skPt1,[0,0,-ang]);
+				
+				skPt2 = superParent.calc.position(skPt2,superParent.calc.reverse(skC1));
+				skPt2 = superParent.calc.rotate.z(skPt2,[0,0,-ang]);
+				
+				skPt3 = superParent.calc.position(skPt3,superParent.calc.reverse(skC1));
+				skPt3 = superParent.calc.rotate.z(skPt3,[0,0,-ang]);
+				
+				//console.log(ang);
+				
+				
+				
+				
+				var lnm = [skPt1[0] - skPt2[0],skPt1[1] - skPt2[1]];
+				var lnk = [skPt2[0] - skPt3[0],skPt2[1] - skPt3[1]];
+				
+				/*
+				console.log(lnm);
+				console.log(lnk);
+				console.log("-----");
+				*/
+				
+				//****var anll = Math.cos(superParent.calcAng(lnm,lnk,false,true) + Math.PI/4) * Math.sqrt( Math.pow(parseFloat(arrg[m][n][3][1]) - parseFloat(arrg[m][n][0][1]),2) + Math.pow(parseFloat(arrg[m][n][3][0]) - parseFloat(arrg[m][n][0][0]),2) );
+				//console.log(anll);
+				
+				var kut = superParent.calcAng(lnm,lnk,false,true);
+				
+				
+				var anll = ((kut - Math.PI/2) / (Math.PI/4)); 
+				
+				//var sclCX = Math.sqrt( Math.pow(arrg[m][n][1][1] - arrg[m][n][0][1],2) + Math.pow(arrg[m][n][1][0] - arrg[m][n][0][0],2) );
+				//var sclCY = Math.sqrt( Math.pow(parseFloat(arrg[m][n][3][1]) - parseFloat(arrg[m][n][0][1]),2) + Math.pow(parseFloat(arrg[m][n][3][0]) - parseFloat(arrg[m][n][0][0]),2) );
+				
+				var sclCX = Math.abs(arrq[m][n][0][0] - arrq[m][n][1][0]);
+				var sclCY = Math.abs(arrq[m][n][0][1] - arrq[m][n][3][1]);
+				
+				var akll = Math.sqrt( Math.pow(parseFloat(arrg[m][n][3][1]) - parseFloat(arrg[m][n][0][1]),2) + Math.pow(parseFloat(arrg[m][n][3][0]) - parseFloat(arrg[m][n][0][0]),2) ) / Math.sqrt( Math.pow(arrg[m][n][1][1] - arrg[m][n][0][1],2) + Math.pow(arrg[m][n][1][0] - arrg[m][n][0][0],2) );
+				
+				var anl = anll * akll;
+				//var anl = -anll/;
+				//console.log(anl);
+				var sclX = Math.abs(skPt1[0] - skPt2[0])/sclCX;
+				var sclY = Math.abs(skPt3[1] - skPt2[1])/sclCY;
+				
+				//console.log(sclX+' '+sclY);
+		
+				
+				/*
+				if(anll > Math.PI/2)
+					anll = -(anll % (Math.PI/2));*/
+				
+				//var anl = (anll / (Math.PI / 4)) * ( (arrq[m][n][2][1] - arrq[m][n][0][1]) / (arrq[m][n][2][0] - arrq[m][n][0][0]));
+				ctx.scale(sclX,sclY);
+				
+				ctx.transform(1,0,-anl,1,0,0);
+				
+			}
+			
+			//ctx.scale(Math.cos(arrs[m][n].spin[0] * iii / (180/Math.PI)),Math.cos(arrs[m][n].spin[1] * iii / (180/Math.PI)));
+			
+			
+			//***ctx.scale(1,Math.cos(arrs[m][n].spin[0] * iii / (180/Math.PI)));
+			//***ctx.scale(-Math.cos((arrs[m][n].spin[1]) * iii / (180/Math.PI)),1);
+			//ctx.scale(Math.cos((arrs[m][n].spin[1]) * iii / (180/Math.PI)),Math.cos(- arrs[m][n].spin[0] * iii / (180/Math.PI)));
+			
+			//***ctx.rotate((arrs[m][n].spin[2])*iii / (180/Math.PI));
+			
+			
+			//console.log(newTrValX,newTrValY);
+			
+			var icCC = 2;
+			
+			//ctx.drawImage(crIm,0+ncl,0,960,nccY);
+			ctx.drawImage(crIm,arrq[m][n][0][0]-ncl,arrq[m][n][0][1],(arrq[m][n][2][0] - arrq[m][n][0][0]),(arrq[m][n][2][1] - arrq[m][n][0][1]), -(arrq[m][n][2][0]-arrq[m][n][0][0])/2 , -(arrq[m][n][2][1]-arrq[m][n][0][1])/2 ,arrq[m][n][2][0] - arrq[m][n][0][0],arrq[m][n][2][1] - arrq[m][n][0][1]);
+			//ctx.drawImage(crIm,arrq[m][n][0][0],arrq[m][n][0][1],arrq[m][n][2][0] - arrq[m][n][0][0],arrq[m][n][2][1] - arrq[m][n][0][1],0,0,arrq[m][n][2][0] - arrq[m][n][0][0],arrq[m][n][2][1] - arrq[m][n][0][1]);
+			//ctx.drawImage(crIm,0,0,50,50,0,0,50,50);
+			
+			
+			
+			ctx.restore();
+			
+		}
+		
+		
+		
+		/*
+		for(var n=0;n<arrg[m].length;n++){
+			
+			ctx.save();
+			ctx.strokeStyle="#000";
+			ctx.beginPath();
+			for(var l=0;l<arrg[m][n].length;l++){
+				
+				if(l === 0){
+					ctx.moveTo(arrg[m][n][l][0],arrg[m][n][l][1]);
+					//console.log(arr[m][n][l][0]+' '+arr[m][n][l][1]);
+				}
+				else{
+					ctx.lineTo(arrg[m][n][l][0],arrg[m][n][l][1]);
+					//console.log(arr[m][n][l][0]+' '+arr[m][n][l][1]);
+				}
+				
+			}
+			//console.log('_______________');
+			ctx.closePath();
+			ctx.stroke();
+			ctx.restore();
+		
+		
+		}*/
+		
+		
+	}
+	
+}
+
+
+
+CrashSlider.prototype.render = function(){
+	
+	var el = this.crushImg;
+	iii++;
+	
+	superParent.clearRect();
+	superParent.physPlane(superParent.grav);
+	superParent.displayCrush(el);
+	
+	//if(iii<=1)
+		requestAnimationFrame(superParent.render);
+}
+
+var dtr = function(v) {return v * Math.PI/180;};
+
+
+CrashSlider.prototype.clearRect = function(){
+	
+	var ctx = superParent.nc.getContext('2d');
+	
+	ctx.clearRect(0,0,superParent.nc.width,superParent.nc.height);
+	
+}
+
+
+CrashSlider.prototype.crashPlane = function(el,type,density,dcc,mcc,scc,posX,posY){
+	
+	
+	width = el.offsetWidth;
+	height = el.offsetHeight;
+	//alert(el.offsetWidth);
+	
+	var oLeft = (document.body.clientWidth - el.offsetWidth)/2;
+	
+	
+	var plusRand = function(width,density){
+		return Math.random() * (width * density/10 * 2) - (width * density/10)
+	}
+	
+	if(!posX)
+		posX = (width/2) + Math.random() * (width * density/10 * 2) - (width * density/10);
+	
+	if(!posY)
+		posY = (height/2) + Math.random() * (height * density/10 * 2) - (height * density/10);
+	
+	
+	//this.arrb = [];
+	var arr = [];
+	var arrg = [];
+	var arrs = [];
+	var arrv = [];
+	var arrq = [];
+	
+	var persCoof = 1;
+	var center = {x:posX,y:posY};
+	//var center = {x:document.body.offsetWidth/2,y:posY};
+	var newWid = width;
+	var widfor = (newWid * density/10 * 2);
+	
+	var dcoof = dcc || 24;
+	var mcoof = mcc || 1.3;
+	var startval = scc || 10;
+	
+	var dang = (Math.PI*2)/dcoof;
+		
+	var nx = center.x - widfor*density/10;
+	var ny = center.y - widfor*density/10;
+	
+	var it = 0;
+	
+	
+	
+	for(var j=startval;j<=width;j*=mcoof){
+		
+		arr[it] = [];
+		arrg[it] = [];
+		arrs[it] = [];
+		arrv[it] = [];
+		arrq[it] = [];
+		
+		var ik = 0;
+		
+		for(var i=dang;i<=Math.PI*2;i+=dang){
+			
+			var px = j * Math.cos(i) + plusRand(j,density) + center.x;
+			var py = j * Math.sin(i) + plusRand(j,density) + center.y;
+			
+			
+			
+			if(px < 0)
+				px = 0;
+			if(px > width)
+				px = width;
+			if(py < 0)
+				py = 0;
+			if(py > height)
+				py = height;
+			
+			
+			
+			if(it === 0){
+				arr[it].push([[center.x + oLeft,center.y,0],[px + oLeft,py,0]]);
+			}
+			else{
+				arr[it].push([arr[it-1][ik][1],[px + oLeft,py,0]]);
+			}
+			
+			ik++;
+			
+		}
+		
+		//alert(arr[it].length);
+		
+		
+		if(it === 0){
+			var k;
+			
+			
+			
+			for(k=0;k<arr[it].length-1;k++){
+				arr[it][k].push(arr[it][k+1][1]);
+			}
+			arr[it][k].push(arr[it][0][1]);
+			
+			
+		}
+		else{
+			var k;
+			
+			
+			for(k=0;k<arr[it].length-1;k++){
+				arr[it][k].push(arr[it][k+1][1]);
+				arr[it][k].push(arr[it-1][k+1][1]);
+			}
+			arr[it][k].push(arr[it][0][1]);
+			arr[it][k].push(arr[it-1][0][1]);
+		}
+		
+		
+		for(k=0;k<arr[it].length;k++){
+			
+			var minH = Infinity,maxH = 0,minW = Infinity,maxW = 0;
+			
+			for(var l=0;l<arr[it][k].length;l++){
+				
+				if(arr[it][k][l][0] < minW)
+					minW = arr[it][k][l][0];
+				if(arr[it][k][l][0] > maxW)
+					maxW = arr[it][k][l][0];
+				if(arr[it][k][l][1] < minH)
+					minH = arr[it][k][l][1];
+				if(arr[it][k][l][1] > maxH)
+					maxH = arr[it][k][l][1];
+				
+			}
+			
+			var centX = (maxW-minW)/2 + minW;
+			var centY = (maxH-minH)/2 + minH;
+			
+			var tmpX = ((centX - center.x - oLeft)/15); //15
+			var tmpY = ((centY - center.y)/15); //15
+			
+			var vectX = tmpX + Math.random() * (tmpX/0.8) - (tmpX/1.6);
+			var vectY = tmpY + Math.random() * (tmpY/0.8) - (tmpY/1.6);
+			var vectZ = 100/(Math.sqrt((tmpX*tmpX) + (tmpY*tmpY)));
+			
+			//SPIN 10-5
+			arrs[it][k] = {'spin':[Math.random()*20-10,Math.random()*20-10,Math.random()*20-10],'vector':[vectX,vectY,vectZ],'center':[centX,centY,0]};
+			
+			arrg[it][k] = [[minW,minH,0],[maxW,minH,0],[maxW,maxH,0],[minW,maxH,0]];
+			arrq[it][k] = [[minW,minH,0],[maxW,minH,0],[maxW,maxH,0],[minW,maxH,0]];
+			
+			arrv[it][k] = [];
+		}
+		
+		
+		it++;
+		
+	}
+	
+	superParent.arp = arr;
+	superParent.arg = arrg;
+	superParent.arb = arr.slice(0);
+	superParent.ars = arrs;
+	superParent.arv = arrv;
+	superParent.arq = arrq;
+	
+	console.log(arrg);
+	console.log(arr);
+	console.log(arrs);
+	
+	
+	var ctx = superParent.nc.getContext('2d');
+	
+	/* DISPLAY TEST */
+	
+	/* DISPLAY TEST END */
+	
+}
+
+
+
+superParent.calc = {
+	size : function(p, size) {
+		
+		if(typeof p == 'Object'){
+		
+			return {
+				x : p.x * size.x,
+				y : p.y * size.y,
+				z : p.z * size.z
+			}
+			
+		}
+		else{
+			
+			return [ p[0] * size[0], p[1] * size[1], p[2] * size[2] ]
+			
+			
+		}
+	},
+	rotate: {
+		x : function(p, rotate) {
+			
+			if(typeof p == 'Object'){
+				
+				return {
+					x : p.x,
+					y : p.y*Math.cos(dtr(rotate.x)) - p.z*Math.sin(dtr(rotate.x)),
+					z : p.y*Math.sin(dtr(rotate.x)) + p.z*Math.cos(dtr(rotate.x))
+				}
+			
+			}
+			else{
+				
+				return [
+					p[0],
+					p[1]*Math.cos(dtr(rotate[0])) - p[2]*Math.sin(dtr(rotate[0])),
+					p[1]*Math.sin(dtr(rotate[0])) + p[2]*Math.cos(dtr(rotate[0]))
+				]
+				
+			}
+		},
+		y : function(p, rotate) {
+			
+			if(typeof p == 'Object'){
+			
+				return {
+					x : p.x*Math.cos(dtr(rotate.y)) + p.z*Math.sin(dtr(rotate.y)),
+					y : p.y,
+					z : -p.x*Math.sin(dtr(rotate.y)) + p.z*Math.cos(dtr(rotate.y))
+				}
+			
+			}
+			else{
+				
+				return [
+					p[0]*Math.cos(dtr(rotate[1])) + p[2]*Math.sin(dtr(rotate[1])),
+					p[1],
+					-p[0]*Math.sin(dtr(rotate[1])) + p[2]*Math.cos(dtr(rotate[1]))
+				]
+				
+			}
+		},
+		z : function(p, rotate) {
+			
+			if(typeof p == 'Object'){
+			
+				return {
+					x : p.x*Math.cos(dtr(rotate.z)) - p.y*Math.sin(dtr(rotate.z)),
+					y : p.x*Math.sin(dtr(rotate.z)) + p.y*Math.cos(dtr(rotate.z)),
+					z : p.z
+				}
+			
+			}
+			else{
+				
+				return [
+					p[0]*Math.cos(dtr(rotate[2])) - p[1]*Math.sin(dtr(rotate[2])),
+					p[0]*Math.sin(dtr(rotate[2])) + p[1]*Math.cos(dtr(rotate[2])),
+					p[2]
+				]
+				
+			}
+		}
+	},
+	position : function(p, position) {
+		
+		if(typeof p == 'Object'){
+		
+			return {
+				x : p.x + position.x,
+				y : p.y + position.y,
+				z : p.z + position.z
+			}
+		
+		}
+		else{
+			return [
+				p[0] + position[0],
+				p[1] + position[1],
+				p[2] + position[2]
+			]
+		}
+	},
+	reverse : function(p){
+		if(typeof p == 'Object'){
+			return {
+				x : -p.x,
+				y : -p.y,
+				z : -p.z
+			}
+		}
+		else{
+			return [
+				-p[0],
+				-p[1],
+				-p[2]
+			]
+		}
+	}
+}
+
+
+CrashSlider.prototype.makeCanvas = function(el){
+	
+	var dems = superParent.getDenensions(el);
+	var glob = {width:document.documentElement.clientWidth, height:document.documentElement.clientHeight, y:document.documentElement.scrollTop || document.body.scrollTop, x:document.documentElement.scrollLeft || document.body.scrollLeft};
+	
+	var c = document.createElement('canvas');
+	c.width = document.body.clientWidth;
+	c.height = dems.height;
+	
+	c.style.top = dems.y;
+	c.style.left = 0;
+	c.style.position = 'absolute';
+	
+	superParent.nc = c;
+	
+	document.body.appendChild(c);
+	
+	var ctx = c.getContext('2d');
+	
+	
+	
+	/*///////////////////////////////////////////////////////////
+	ctx.save();
+	
+	ctx.translate(dems.x,0);
+	
+	ctx.transform(1, 0.8, -0.1, 1, 30, 10);
+
+	
+	
+	
+	
+	ctx.beginPath();
+	ctx.arc(dems.x+115, 115, 100, 0, Math.PI * 2);
+	ctx.closePath();
+	ctx.clip();
+	
+	ctx.drawImage(el, dems.x, 0, dems.width, dems.height);
+
+	ctx.restore();
+	///////////////////////////////////////////////////////////////*/
+	
+	
+}
+
+
+
+function initSlider(){
+	crash = new CrashSlider('tst');
+	
+	var poss = crash.makeCanvas(crash.crushImg);
+	
+	crash.crushImg.style.visibility = 'hidden';
+	
+	crash.crashPlane(crash.crushImg,1,1,32,1.3,15);
+	crash.render();
+	
+	
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*///////////////////////////////////CALC/////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+WTProto.calc = {
+        size : function(p, size) {
+            return {
+                x : p.x * size.x,
+                y : p.y * size.y,
+                z : p.z * size.z
+            }
+        },
+        rotate: {
+            x : function(p, rotate) {
+                return {
+                    x : p.x,
+                    y : p.y*Math.cos(dtr(rotate.x)) - p.z*Math.sin(dtr(rotate.x)),
+                    z : p.y*Math.sin(dtr(rotate.x)) + p.z*Math.cos(dtr(rotate.x))
+                }
+            },
+            y : function(p, rotate) {
+                return {
+                    x : p.x*Math.cos(dtr(rotate.y)) + p.z*Math.sin(dtr(rotate.y)),
+                    y : p.y,
+                    z : -p.x*Math.sin(dtr(rotate.y)) + p.z*Math.cos(dtr(rotate.y))
+                }
+            },
+            z : function(p, rotate) {
+                return {
+                    x : p.x*Math.cos(dtr(rotate.z)) - p.y*Math.sin(dtr(rotate.z)),
+                    y : p.x*Math.sin(dtr(rotate.z)) + p.y*Math.cos(dtr(rotate.z)),
+                    z : p.z
+                }
+            }
+        },
+        position : function(p, position) {
+            return {
+                x : p.x + position.x,
+                y : p.y + position.y,
+                z : p.z + position.z
+            }
+        },
+        transform : function(p,pt){
+
+
+
+            var ppt = this.size(p,pt.scl);
+            ppt = this.position(ppt,pt.pos);
+            ppt = this.rotate.x(ppt,pt.rot);
+            ppt = this.rotate.y(ppt,pt.rot);
+            ppt = this.rotate.z(ppt,pt.rot);
+            //alert(ppt.x+' '+ ppt.y+' '+ ppt.z+' - '+pt.pos.x+' '+pt.pos.y+' '+pt.pos.z);
+            return ppt;
+        },
+        transformObj : function(p,pt,lPos){
+
+
+
+            var ppt = this.size(p,pt.scl);
+
+            ppt = this.rotate.x(ppt,pt.rot);
+            ppt = this.rotate.y(ppt,pt.rot);
+            ppt = this.rotate.z(ppt,pt.rot);
+
+
+            ppt = this.position(ppt,pt.pos);
+            //alert(ppt.x+' '+ ppt.y+' '+ ppt.z+' - '+pt.pos.x+' '+pt.pos.y+' '+pt.pos.z);
+            return ppt;
+        },
+        perspective : function(p,camera) {
+            var coof = camera.focus/camera.pos.z;
+            return {
+                x : p.x * ((camera.focus-camera.pos.z) / ((camera.focus-camera.pos.z) - p.z)) * -coof * camera.zoom,
+                y : p.y * ((camera.focus-camera.pos.z) / ((camera.focus-camera.pos.z) - p.z)) * -coof * camera.zoom,
+                z : p.z * ((camera.focus-camera.pos.z) / ((camera.focus-camera.pos.z) - p.z)) * -coof * camera.zoom,
+                p : ((camera.focus-camera.pos.z) / ((camera.focus-camera.pos.z) - p.z)) * camera.zoom
+            }
+        }
+
+
+    };
+
+
+
+
+*/
+
+
+
+
+</script>
+
+
+<div style="position: relative; width: 960px; margin: 0 auto;">
+
+
+<div style="position: relative; float:left; width: 100%;">
+
+
+<img id="tst" style="width: 100%;" src = "images/1.jpeg">
+
+
+</div>
+
+
+<button onclick = "initSlider()">GO</button>
+
+
+</div>
