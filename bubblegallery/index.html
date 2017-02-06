@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <link rel="stylesheet" href="css/bubbles-style.css">
+
+    <script src="js/bubbles-gallery.min.js"></script>
+	
+	<style>
+		.divs{
+			width: 80px; 
+			height: 80px;
+			background-size: cover; 
+			background-position: center;
+			position: absolute;
+			top:0;
+			left:0;
+		}
+		
+		.dnext{
+			top:20px;
+			left:20px;
+			box-shadow: -1px -1px 3px #343434;
+		}
+		
+		.dnext2{
+			top:40px;
+			left:40px;
+			box-shadow: -4px -4px 8px rgba(0,0,0,0.5);
+		}
+		
+		.bddiv{
+			border:none;
+			
+			width: 120px; 
+			height: 120px;
+			position: relative;
+			overflow: hidden;
+			border-radius: 4px;
+			cursor: pointer;
+			
+		}
+		
+		.bblackup{
+			background-color: rgba(0,0,0,0.6);
+			opacity:0.05;
+			position: absolute;
+			top: 100%;
+			width: 100%;
+			height: 100%;
+			transition: all 0.2s;
+			color: #fdfdfd;
+			font-size: 28px;
+			text-align: center;
+		}
+		
+		.opennn{
+			padding: 30px 0;
+			position: relative;
+			float:left;
+			font-weight: bold;
+		}
+		
+		.bddiv:hover .bblackup{
+			top: 0;
+			opacity: 1;
+		}
+		
+		
+	</style>
+</head>
+<body>
+
+
+<div id="imgs" style="display: none;"
+     data-imgs="
+    images/009_WallpapersFullHD_12102009_Go2LoadCOM.jpg|
+    images/114.jpg|
+    images/1286903577_laba.ws_best_girls_-0027.jpg|
+    images/1290795255_w17.jpg|
+    images/275251c46d4fd1a333b23368222acba3_large.jpeg|
+    images/full-hd-nature-wallpapers-for-laptop-pc-3.jpg|
+    images/Full-Hd-Wallpaper-55.jpg|
+    images/full_hd__1920x1080____above_and_beyond___wallpaper_by_willfactormedia-d5j2ahf.jpg|
+    images/full_hd_wallpapers_45_21.jpg|
+    images/Lion_Animal_Full_HD_Wallpaper.jpg"
+     data-imgs-mini="
+    mini/009_WallpapersFullHD_12102009_Go2LoadCOM.jpg|
+    mini/114.jpg|
+    mini/1286903577_laba.ws_best_girls_-0027.jpg|
+    mini/1290795255_w17.jpg|
+    mini/275251c46d4fd1a333b23368222acba3_large.jpeg|
+    mini/full-hd-nature-wallpapers-for-laptop-pc-3.jpg|
+    mini/Full-Hd-Wallpaper-55.jpg|
+    mini/full_hd__1920x1080____above_and_beyond___wallpaper_by_willfactormedia-d5j2ahf.jpg|
+    mini/full_hd_wallpapers_45_21.jpg|
+    mini/Lion_Animal_Full_HD_Wallpaper.jpg"
+     data-desc="Some description of the imgae like Date or place or type or some think else...
+     |Some description of the imgae like Date or place or type or some think else...
+     |Perfect shot :)
+     |
+     |
+     |
+     Some special Info... 30.01.2015 lol"></div>
+
+
+<div class="bddiv" style="" id="show-bubbles" onclick="showBubbles('imgs')">
+	<div class="divs" style="background-image:url(thumb/1290795255_w17.jpg)"></div>
+	<div class="divs dnext" style="background-image:url(thumb/114.jpg)"></div>
+	<div class="divs dnext2" style="background-image:url(thumb/full-hd-nature-wallpapers-for-laptop-pc-3.jpg)"></div>
+	<div class="bblackup"><span class="opennn">Open Gallery</span></div>
+</div> 
+
+
+</body>
+</html>

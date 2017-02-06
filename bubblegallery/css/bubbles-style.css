@@ -1,0 +1,468 @@
+/**
+ * Website: http://twos.in/
+ *
+ * Licensed under The Twos Studio License ( http://twos.in/ )
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @author Immortal <Immortal0ua@gmail.com>
+ * @version 1.1
+ */
+
+/***************LOADING**************/
+.ts_loaddiv{
+    width: 100%;
+    height: 50px;
+    position: relative;
+    margin: 0 auto;
+    text-align: center;
+
+
+}
+.ts_loadcircle{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: #ededed;
+    position: absolute;
+    margin: 5px;
+    position: relative;
+    float:left;
+    transition: all 1s;
+    bottom:0;
+
+
+
+}
+
+.b-over-hide{
+    overflow: hidden !important;
+}
+
+.ts_loading{
+    position: relative;
+    /* float: left; */
+    /* top: 100px; */
+    /* left: 100px; */
+    width: 260px;
+    margin: auto;
+    top: 50%;
+    margin-top: -28px;
+    transition: top 0.4s,margin 0.4s;
+    box-sizing: border-box;
+    z-index: 2;
+
+}
+
+
+
+
+.ts_loading.complite{
+    top: 100%;
+    margin-top: -50px;
+    width: 100%;
+}
+
+
+@-webkit-keyframes ts_loadscreen {
+    0%{
+        top:0;
+
+        left: 0;
+
+    }
+    20%{
+        top:-50px;
+        width: 40px;
+        height: 40px;
+        left: 0px;
+        background: #565656;
+    }
+
+    30%{
+        width: 50px;
+        margin-left: -5px;
+        height: 40px;
+    }
+    77%{
+        width: 40px;
+        margin-left: 0;
+        height: 40px;
+    }
+
+    80%{
+
+        top:-50px;
+        left: 200px;
+        width: 40px;
+        height: 40px;
+        background: #565656;
+    }
+
+    100%{
+        top:0;
+        left: 200px;
+        background: #ededed;
+
+    }
+
+}
+
+@-webkit-keyframes ts_loadscreenconv {
+    0%{
+
+
+        margin-left: 55px;
+
+    }
+
+    100%{
+
+        margin-left: 5px;
+
+    }
+
+}
+
+
+.ts_loadc1{
+    -webkit-animation: ts_loadscreen 1s; /* Chrome, Safari, Opera */
+    animation: ts_loadscreen 1s;
+    -webkit-animation-timing-function: ease;
+    -webkit-animation-iteration-count: infinite;
+    position: absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom: 0;
+}
+
+.ts_loadc2{
+    -webkit-animation: ts_loadscreenconv 1s;
+    animation: ts_loadscreen 1s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+}
+
+
+
+
+
+
+
+
+/***************BACKGROUND*************/
+
+.show-back-full{
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    z-index: 10050;
+    transition: all 0.55s;
+    display: none;
+}
+
+.show-back-full.faded{
+    background-color: rgba(0,0,0,0.85);
+}
+
+.show-back-full.active{
+    display: block;
+}
+
+
+
+/****************NEW_BUBBLES**************/
+.img_bubbles{
+    width: 40px;
+    height: 40px;
+    position: relative;
+    margin-right: 10px;
+    margin-left: 10px;
+    background-color: #ededed;
+    border-radius: 50%;
+    bottom: 0;
+    transition: all 0.5s;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.bigBlock{
+    position: absolute;
+    top: 50%;
+    bottom: 50%;
+    left: 50%;
+    right: 50%;
+    width: 50px;
+    height: 50px;
+    /*background-color: #ededed;*/
+    border-radius: 0;
+    transition: all 0.5s;
+}
+
+.bigBlock.active{
+    position: absolute;
+    top: 50px;
+    bottom: 60px;
+    left: 100px;
+    right: 100px;
+    border-radius: 0;
+    transition: all 0.5s;
+    width: auto;
+    height: auto;
+
+}
+
+.img_bubbles.after{
+    position: absolute;
+    display: block;
+    top:0;
+    -moz-transition-property: none;
+    -webkit-transition-property: none;
+    -o-transition-property: none;
+    transition-property: none;
+
+    -moz-transition-property: opacity 0.3s, transform 0.3s;
+    -webkit-transition-property: opacity 0.3s, transform 0.3s;
+    -o-transition-property: opacity 0.3s, transform 0.3s;
+    transition-property: opacity 0.3s, transform 0.3s;
+
+    cursor: pointer;
+
+}
+
+.img_bubbles.after:hover {
+    /*opacity: 0;*/
+
+}
+
+
+
+.bubIn{
+    position: absolute;
+    background-size: cover;
+    background-position: center;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+
+}
+
+.bubInUp{
+    position: absolute;
+    z-index: 2;
+    top:0;
+    left:0;
+    background-color: #ededed;
+    width: 100%;
+    height: 100%;
+
+
+}
+
+.actImg{
+    width: 40px;
+    height: 40px;
+    left:50%;
+    right:50%;
+    position: absolute;
+    top:50%;
+    bottom:50%;
+    overflow: hidden;
+
+}
+
+.actImg.active .after{
+    content: "";
+    width: 100%;
+    height: 30%;
+    position: absolute;
+    z-index: 11;
+    top: 100%;
+    box-shadow: 0 0 15px 1px #000;
+    background-color: rgba(170,170,170,0.3);
+    transition: top 0.2s, opacity 0.2s;
+    opacity: 0.05;
+    box-sizing: border-box;
+    padding: 25px;
+    font-size: 22px;
+    color: #121212;
+    font-weight: bold;
+    font-family: "Consolas", "Monaco", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+
+}
+
+.bubble-move{
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    opacity: 0.4;
+    top:0;
+    bottom:0;
+    transition: opacity 0.35s;
+    overflow: hidden;
+    cursor: pointer;
+
+}
+
+.bubble-close{
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    opacity: 0.4;
+    top:-50px;
+    transition: opacity 0.35s;
+    overflow: hidden;
+    cursor: pointer;
+    height: auto;
+    width: auto;
+}
+
+.bubble-close::before{
+    content:"";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top:50%;
+    left:50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    border-radius: 50%;
+    background-color: #fdfdfd;
+}
+.bubble-close::after{
+    content: "×";
+    font-size: 25px;
+    position: absolute;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    line-height: 25px;
+    margin-top: -12px;
+    margin-left: -7px;
+    z-index: 2;
+}
+
+
+.bubble-move.left::before{
+    content:"";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top:50%;
+    left:50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    border-radius: 50%;
+    background-color: #fdfdfd;
+
+}
+
+.bubble-move.right::before{
+    content:"";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top:50%;
+    right:50%;
+    margin-top: -20px;
+    margin-right: -20px;
+    border-radius: 50%;
+    background-color: #fdfdfd;
+
+}
+
+.bubble-move.left::after{
+    content:"";
+    position: absolute;
+    top:50%;
+    left:50%;
+    margin-top: -8px;
+    margin-left: -6px;
+    z-index: 2;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 8px 8px 8px 0;
+    border-color: transparent #111 transparent transparent;
+}
+.bubble-move.right::after{
+    content:"";
+    position: absolute;
+    top:50%;
+    right:50%;
+    margin-right: -6px;
+    margin-top: -8px;
+    z-index: 2;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 8px 0 8px 8px;
+    border-color: transparent transparent transparent #111;
+}
+
+.bubble-move:hover, .bubble-close:hover{
+    opacity: 0.95;
+}
+
+.bubble-move.hidded{
+    /*display: none;*/
+}
+
+.bubble-move.left{
+    left: -100px;
+}
+
+.bubble-move.right{
+    right: -100px;
+}
+
+.actImg .after::selection {
+    background-color: #111;
+    color: #fff;
+}
+
+.actImg .after::-moz-selection {
+
+}
+
+
+.actImg.active:hover .after{
+    top: 70%;
+    opacity: 1;
+}
+
+
+.actImgOnTop{
+    background-color: #ededed;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    position: absolute;
+    top:0;
+    left:0;
+}
+
+.actImg img{
+    max-width: 100%;
+    max-height: 100%;
+    box-shadow: 0 0 15px 0px #000;
+    position: absolute;
+    top:0;
+    left:0;
+
+}
+
+.flatBack{
+    position: absolute;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: none;
+}
+
+.flatBack.active{
+    display: block;
+}
