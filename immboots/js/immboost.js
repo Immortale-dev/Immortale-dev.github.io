@@ -1306,6 +1306,9 @@ numbers.prototype.activate = function(){
 	this._o.DP = this;
 	var self = this;
 	
+	
+	this.maxp = 3;
+	
 	var nContainer = document.createElement('div');
 	nContainer.classList.add('imm-number-container');
 	o.parentNode.insertBefore(nContainer,o);
@@ -1326,7 +1329,7 @@ numbers.prototype.activate = function(){
 		}
 	}
 	
-	o.addEventListener('change',function(){ idiv.children[0].innerHTML = this.value; },false);
+	o.addEventListener('change',function(){ if(!self.pushed) idiv.children[0].innerHTML = this.value; self.val = this.value; },false);
 	o.addEventListener('keydown',function(){ var slf = this; setTimeout(function(){ filterN.call(slf); },0); },false);
 	o.addEventListener('keypress',function(){ var slf = this; setTimeout(function(){ filterN.call(slf); },0); },false);
 	//o.addEventListener('keydown',filterN,false);
@@ -1338,10 +1341,17 @@ numbers.prototype.activate = function(){
 	idiv.innerHTML = '<span></span>';
 	nContainer.appendChild(idiv);
 	
+	this.counter = idiv;
+	
 	var pdiv = document.createElement('div');
 	pdiv.classList.add('imm-number-picker');
-	pdiv.innerHTML = '<span></span>';
+	pdiv.innerHTML = '<span>1</span>';
 	nContainer.appendChild(pdiv);
+	
+	this.picked = 1;
+	this.p = 0;
+	
+	this.picker = pdiv;
 	
 	filterN.call(o);
 	
@@ -1369,17 +1379,69 @@ numbers.prototype.activate = function(){
 	});
 }
 numbers.prototype._moveEvent = function(e){
-	console.log(e);
 	this.cur = {x:e.clientX,y:e.clientY};
+	this.calcPicker();
+	//console.log(this.picked);
+	this.calcNumber();
+	this.changeVis();
 }
 numbers.prototype._upEvent = function(e){
 	//var self = IMM.NUMBER.prototype;
 	this.pushed = 0;
 	this.block.classList.remove('active');
+	this.setPicker(1);
+	this.p = 0;
 	window.removeEventListener('mousemove',this._fMove,false);
 	window.removeEventListener('mouseup',this._fUp,false);
 }
-
+numbers.prototype.calcPicker = function(){
+	var movedX = parseInt((this.cur.x-this.pos.x)/30);
+	
+	console.log(this.pos.x);
+	
+	
+	if(movedX != 0){
+	
+		var p = parseInt(this.p);
+		p += movedX;
+		if(p < 0)
+			p = 0;
+		if(p > this.maxp)
+			p = this.maxp;
+		this.p = p;
+		
+		this.pos.x = this.cur.x;
+		
+		var num = Math.pow(10,p);
+		this.setPicker(num);
+	
+	}
+}
+numbers.prototype.calcNumber = function(){
+	var v = Math.floor((this.pos.y-this.cur.y)/20);
+	//console.log(v);
+	if(v !== 0){
+		//console.log(v+' '+this.picked+' '+parseFloat(v*this.picked));
+		this.pos.y -= v*20;
+		this.val = parseInt(this.val)+parseInt(v*this.picked);
+		this._o.value = this.val;
+		if("createEvent" in document){
+			var ev = document.createEvent("HTMLEvents");
+			ev.initEvent('change',false,true);
+			this._o.dispatchEvent(ev);
+		}
+		else{
+			this._o.fireEvent('change');
+		}
+	}
+}
+numbers.prototype.setPicker = function(num){
+	this.picker.children[0].innerHTML = num;
+	this.picked = num;
+}
+numbers.prototype.changeVis = function(){
+	this.counter.children[0].innerHTML = this.val;
+}
 
 
 

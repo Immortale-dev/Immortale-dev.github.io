@@ -1195,7 +1195,8 @@ textarea, .textarea{
     border-radius: 50%;
     border: solid 3px #aaaaaa;
     box-sizing: border-box;
-    padding: 5px;
+    padding: 8px 0;
+	
 }
 .imm-number-picker::before{
     position: absolute;
@@ -1212,6 +1213,10 @@ textarea, .textarea{
 	font-weight: bold;
 	position: relative;
 	display: block;
+	text-align: center;
+	display: none;
+	font-size: 12px;
+	color: #777;
 }
 .imm-number{
 	font-size: 16px;
@@ -1233,6 +1238,12 @@ textarea, .textarea{
     display: inline-block;
 }
 
+.imm-number-container.active .imm-number-picker::before{
+	display: none;
+}
+.imm-number-container.active .imm-number-picker > span{
+	display: block;
+}
 .imm-number-container.active .imm-number{
 	display: none;
 }
