@@ -1329,7 +1329,7 @@ numbers.prototype.activate = function(){
 		}
 	}
 	
-	o.addEventListener('change',function(){ if(!self.pushed) idiv.children[0].innerHTML = this.value; self.val = this.value; },false);
+	o.addEventListener('change',function(){ if(!self.pushed) idiv.children[0].innerHTML = this.value; self.val = parseInt(this.value); },false);
 	o.addEventListener('keydown',function(){ var slf = this; setTimeout(function(){ filterN.call(slf); },0); },false);
 	o.addEventListener('keypress',function(){ var slf = this; setTimeout(function(){ filterN.call(slf); },0); },false);
 	//o.addEventListener('keydown',filterN,false);
@@ -1345,7 +1345,7 @@ numbers.prototype.activate = function(){
 	
 	var pdiv = document.createElement('div');
 	pdiv.classList.add('imm-number-picker');
-	pdiv.innerHTML = '<span>1</span>';
+	//pdiv.innerHTML = '<span>1</span>';
 	nContainer.appendChild(pdiv);
 	
 	this.picked = 1;
@@ -1375,15 +1375,19 @@ numbers.prototype.activate = function(){
 		self.block.classList.add('active');
 		window.addEventListener('mousemove',self._fMove,false);
 		window.addEventListener('mouseup',self._fUp,false);
+		var pickerDiv = self.createPickerPlace();
+		self.pid = pickerDiv;
+		self.picker.appendChild(pickerDiv);
 		return false;
 	});
 }
 numbers.prototype._moveEvent = function(e){
 	this.cur = {x:e.clientX,y:e.clientY};
-	this.calcPicker();
+	
 	//console.log(this.picked);
 	this.calcNumber();
 	this.changeVis();
+	this.calcPicker();
 }
 numbers.prototype._upEvent = function(e){
 	//var self = IMM.NUMBER.prototype;
@@ -1391,14 +1395,59 @@ numbers.prototype._upEvent = function(e){
 	this.block.classList.remove('active');
 	this.setPicker(1);
 	this.p = 0;
+	
+	if(this.pid)
+		this.pid.parentNode.removeChild(this.pid);
+	this.pid = null;
 	window.removeEventListener('mousemove',this._fMove,false);
 	window.removeEventListener('mouseup',this._fUp,false);
+}
+numbers.prototype.createPickerPlace = function(){
+	
+	var sp = document.createElement('span');
+	sp.classList.add('imm-number-pick-nb');
+	
+	var span = document.createElement('span');
+	span.classList.add('imm-number-pick-n');
+	
+	sp.appendChild(span);
+	
+	var v = this.val;
+	var di = document.createElement('i');
+	di.innerHTML = v;
+	di.classList.add('imm-number-pi');
+	span.appendChild(di);
+	//v += 4;
+	for(var i=1;i<5;i++){
+		di = document.createElement('i');
+		di.classList.add('imm-number-pi');
+		di.innerHTML = v+i*this.picked;
+		span.appendChild(di);
+		di = document.createElement('i');
+		di.classList.add('imm-number-pi');
+		di.innerHTML = v-i*this.picked;
+		span.insertBefore(di,span.children[0]);
+	}
+
+	span.D = this.picked;	
+	span.P = 0;
+	
+	return sp;
+}
+numbers.prototype.rebuildPicks = function(){
+	for(var i=0;i<this.picker.children[0].children.length;i++){
+		var pp = this.picker.children[0].children[i];
+		var k = this.val-4*pp.D;
+		for(var j=0;j<pp.children.length;j++){
+			pp.children[j].innerHTML = k;
+			k+=pp.D;
+		}
+	}
 }
 numbers.prototype.calcPicker = function(){
 	var movedX = parseInt((this.cur.x-this.pos.x)/30);
 	
 	console.log(this.pos.x);
-	
 	
 	if(movedX != 0){
 	
@@ -1416,13 +1465,21 @@ numbers.prototype.calcPicker = function(){
 		this.setPicker(num);
 	
 	}
+
+	var movedY = parseInt(this.cur.y-this.pos.y);
+	for(var i=0;i<this.picker.children[0].children.length;i++){
+		var pp = this.picker.children[0].children[i];
+		pp.P = movedY+'px';
+		pp.style.top = movedY+'px';
+	}
+
 }
 numbers.prototype.calcNumber = function(){
-	var v = Math.floor((this.pos.y-this.cur.y)/20);
+	var v = parseInt((this.pos.y-this.cur.y)/15);
 	//console.log(v);
 	if(v !== 0){
 		//console.log(v+' '+this.picked+' '+parseFloat(v*this.picked));
-		this.pos.y -= v*20;
+		this.pos.y -= v*15;
 		this.val = parseInt(this.val)+parseInt(v*this.picked);
 		this._o.value = this.val;
 		if("createEvent" in document){
@@ -1433,11 +1490,40 @@ numbers.prototype.calcNumber = function(){
 		else{
 			this._o.fireEvent('change');
 		}
+		this.rebuildPicks();
 	}
 }
 numbers.prototype.setPicker = function(num){
-	this.picker.children[0].innerHTML = num;
+	//this.picker.children[0].innerHTML = num;
+	
+	if(this.picked == num)
+		return;
+	
 	this.picked = num;
+	var np = this.createPickerPlace();
+	
+	if(this.pid){
+		np.children[0].style.left = 100+'%';
+		this.pid.appendChild(np.children[0]);
+		var pd = this.pid;
+		
+		var pdO = pd.children[pd.children.length-2];
+		var pdN = pd.children[pd.children.length-1];
+
+		pdN.P = pdO.P;
+		pdN.style.top = pdN.P+'px';
+		
+		setTimeout(function(){
+			pdO.style.left = -100+'%';
+			pdN.style.left = 0;
+		},0);
+		setTimeout(function(){
+			pd.removeChild(pdO);
+		},200);
+	}
+	else{
+		this.picker.appendChild(np);
+	}
 }
 numbers.prototype.changeVis = function(){
 	this.counter.children[0].innerHTML = this.val;
