@@ -1180,6 +1180,73 @@ textarea, .textarea{
 }
 
 
+/* IMM-NUMBERS */
+.imm-number-container{
+	position: relative;
+	height: 50px;
+    box-sizing: border-box;
+}
+.imm-number-picker{
+    position: absolute;
+    right: 5px;
+    width: 40px;
+    top: 5px;
+    height: 40px;
+    border-radius: 50%;
+    border: solid 3px #aaaaaa;
+    box-sizing: border-box;
+    padding: 5px;
+}
+.imm-number-picker::before{
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #aaaaaa;
+    content: '';
+}
+.imm-number-picker > span{
+	font-size: 14px;
+	font-weight: bold;
+	position: relative;
+	display: block;
+}
+.imm-number{
+	font-size: 16px;
+}
+.imm-number-counter{
+	position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 30px;
+    right: 30px;
+    line-height: 2em;	
+	display: none;
+}
+.imm-number-counter > span{
+	font-size: 16px;
+    /* vertical-align: bottom; */
+    line-height: 1.8em;
+    height: 100%;
+    display: inline-block;
+}
+
+.imm-number-container.active .imm-number{
+	display: none;
+}
+.imm-number-container.active .imm-number-counter{
+	display: block;
+}
+.imm-number-container.active .imm-number-picker{
+	top: 4px;
+	right: 4px;
+}
+.imm-number-container.active{
+	border: solid 1px #aaa;
+}
+
 
 
 

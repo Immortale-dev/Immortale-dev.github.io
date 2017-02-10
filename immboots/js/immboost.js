@@ -49,6 +49,10 @@ Imm.prototype.DATEPICKER = function(inp){
 	this._o = inp;
 	this.activate();
 }
+Imm.prototype.NUMBER = function(inp){
+	this._o = inp;
+	this.activate();
+}
 
 var tabs = Imm.prototype.TAB;
 var inps = Imm.prototype.INP;
@@ -57,6 +61,7 @@ var rads = Imm.prototype.RADIO;
 var checks = Imm.prototype.CHECK;
 var scrolls = Imm.prototype.SCROLL;
 var datepickers = Imm.prototype.DATEPICKER;
+var numbers = Imm.prototype.NUMBER;
 
 
 
@@ -1293,6 +1298,89 @@ datepickers.prototype.closedialog = function(){
 
 
 
+////////////////////////////////////////////////////////////////
+///////////////////////NUMBER///////////////////////////////////
+////////////////////////////////////////////////////////////////
+numbers.prototype.activate = function(){
+	var o = this._o;
+	this._o.DP = this;
+	var self = this;
+	
+	var nContainer = document.createElement('div');
+	nContainer.classList.add('imm-number-container');
+	o.parentNode.insertBefore(nContainer,o);
+	nContainer.appendChild(o);
+	var self = this;
+	
+	var filterN = function(){
+		//alert(1);
+		this.value = parseInt(this.value) || 0;
+		
+		if("createEvent" in document){
+			var ev = document.createEvent("HTMLEvents");
+			ev.initEvent('change',false,true);
+			this.dispatchEvent(ev);
+		}
+		else{
+			this.fireEvent('change');
+		}
+	}
+	
+	o.addEventListener('change',function(){ idiv.children[0].innerHTML = this.value; },false);
+	o.addEventListener('keydown',function(){ var slf = this; setTimeout(function(){ filterN.call(slf); },0); },false);
+	o.addEventListener('keypress',function(){ var slf = this; setTimeout(function(){ filterN.call(slf); },0); },false);
+	//o.addEventListener('keydown',filterN,false);
+	o.addEventListener('keyup',filterN,false);
+	
+	
+	var idiv = document.createElement('div');
+	idiv.classList.add('imm-number-counter');
+	idiv.innerHTML = '<span></span>';
+	nContainer.appendChild(idiv);
+	
+	var pdiv = document.createElement('div');
+	pdiv.classList.add('imm-number-picker');
+	pdiv.innerHTML = '<span></span>';
+	nContainer.appendChild(pdiv);
+	
+	filterN.call(o);
+	
+	this.pushed = 0;
+	
+	this.block = nContainer;
+	
+	
+	this._fMove = function(e){
+		self._moveEvent.call(self,e);
+	}
+	this._fUp = function(e){
+		self._upEvent.call(self,e);
+	}
+	
+	
+	pdiv.addEventListener('mousedown',function(e){
+		e.preventDefault();
+		self.pushed = 1;
+		self.pos = {x:e.clientX,y:e.clientY};
+		self.block.classList.add('active');
+		window.addEventListener('mousemove',self._fMove,false);
+		window.addEventListener('mouseup',self._fUp,false);
+		return false;
+	});
+}
+numbers.prototype._moveEvent = function(e){
+	console.log(e);
+	this.cur = {x:e.clientX,y:e.clientY};
+}
+numbers.prototype._upEvent = function(e){
+	//var self = IMM.NUMBER.prototype;
+	this.pushed = 0;
+	this.block.classList.remove('active');
+	window.removeEventListener('mousemove',this._fMove,false);
+	window.removeEventListener('mouseup',this._fUp,false);
+}
+
+
 
 
 
@@ -1392,6 +1480,14 @@ Imm.prototype.parseScrolls = function(pBlock){
 			var scroll = new IMM.SCROLL(allScrolls[i]);
 	}
 }
+Imm.prototype.parseNumbers = function(pBlock){
+	if(!pBlock)
+		pBlock = document;
+	var allNumbers = pBlock.getElementsByClassName("imm-number");
+	for(var i=0;i<allNumbers.length;i++){
+		var number = new IMM.NUMBER(allNumbers[i]);
+	}
+}
 
 
 Imm.prototype.parseAll = function(pBlock){
@@ -1405,6 +1501,7 @@ Imm.prototype.parseAll = function(pBlock){
 	IMM.parseScrolls(pBlock);
 	IMM.parseRads(pBlock);
 	IMM.parseDates(pBlock);
+	IMM.parseNumbers(pBlock);
 }
 
 
