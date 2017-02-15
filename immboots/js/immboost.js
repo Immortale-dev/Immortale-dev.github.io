@@ -1366,15 +1366,21 @@ numbers.prototype.activate = function(){
 	this._fUp = function(e){
 		self._upEvent.call(self,e);
 	}
+	this._fCm = function(e){
+		self._contextEvent.call(self,e);
+	}
 	
 	
 	pdiv.addEventListener('mousedown',function(e){
 		e.preventDefault();
+		if(e.which != 1)
+			return;
 		self.pushed = 1;
 		self.pos = {x:e.clientX,y:e.clientY};
 		self.block.classList.add('active');
 		window.addEventListener('mousemove',self._fMove,false);
 		window.addEventListener('mouseup',self._fUp,false);
+		window.addEventListener('contextmenu',self._fCm,false);
 		var pickerDiv = self.createPickerPlace();
 		self.pid = pickerDiv;
 		self.picker.appendChild(pickerDiv);
@@ -1391,16 +1397,23 @@ numbers.prototype._moveEvent = function(e){
 }
 numbers.prototype._upEvent = function(e){
 	//var self = IMM.NUMBER.prototype;
+	if(e.which != 1)
+		return;
 	this.pushed = 0;
 	this.block.classList.remove('active');
-	this.setPicker(1);
-	this.p = 0;
+	//this.setPicker(1);
+	//this.p = 0;
 	
 	if(this.pid)
 		this.pid.parentNode.removeChild(this.pid);
 	this.pid = null;
 	window.removeEventListener('mousemove',this._fMove,false);
 	window.removeEventListener('mouseup',this._fUp,false);
+	window.removeEventListener('contextmenu',this._fCm,false);
+}
+numbers.prototype._contextEvent = function(e){
+	e.preventDefault();
+	this.calcPicker(1);
 }
 numbers.prototype.createPickerPlace = function(){
 	
@@ -1444,19 +1457,21 @@ numbers.prototype.rebuildPicks = function(){
 		}
 	}
 }
-numbers.prototype.calcPicker = function(){
-	var movedX = parseInt((this.cur.x-this.pos.x)/30);
+numbers.prototype.calcPicker = function(t){
+	//var movedX = parseInt((this.cur.x-this.pos.x)/30);
 	
-	console.log(this.pos.x);
+	//console.log(this.pos.x);
 	
-	if(movedX != 0){
+	
+	
+	if(t){
 	
 		var p = parseInt(this.p);
-		p += movedX;
+		p ++;
 		if(p < 0)
-			p = 0;
-		if(p > this.maxp)
 			p = this.maxp;
+		if(p > this.maxp)
+			p = 0;
 		this.p = p;
 		
 		this.pos.x = this.cur.x;
@@ -1475,7 +1490,7 @@ numbers.prototype.calcPicker = function(){
 
 }
 numbers.prototype.calcNumber = function(){
-	var v = parseInt((this.pos.y-this.cur.y)/15);
+	var v = Math.round((this.pos.y-this.cur.y)/15);
 	//console.log(v);
 	if(v !== 0){
 		//console.log(v+' '+this.picked+' '+parseFloat(v*this.picked));
