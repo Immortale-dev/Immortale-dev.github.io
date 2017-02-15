@@ -53,6 +53,10 @@ Imm.prototype.NUMBER = function(inp){
 	this._o = inp;
 	this.activate();
 }
+Imm.prototype.COLOR = function(inp){
+	this._o = inp;
+	this.activate();
+}
 
 var tabs = Imm.prototype.TAB;
 var inps = Imm.prototype.INP;
@@ -62,6 +66,7 @@ var checks = Imm.prototype.CHECK;
 var scrolls = Imm.prototype.SCROLL;
 var datepickers = Imm.prototype.DATEPICKER;
 var numbers = Imm.prototype.NUMBER;
+var colors = Imm.prototype.COLOR;
 
 
 
@@ -1545,6 +1550,32 @@ numbers.prototype.changeVis = function(){
 }
 
 
+////////////////////////////////////////////////////////////////
+///////////////////////COLORS///////////////////////////////////
+////////////////////////////////////////////////////////////////
+colors.prototype.activate = function(){
+	var o = this._o;
+	this._o.DP = this;
+	var self = this;
+	
+	var nContainer = document.createElement('div');
+	nContainer.classList.add('imm-color-container');
+	o.parentNode.insertBefore(nContainer,o);
+	nContainer.appendChild(o);
+	var self = this;
+	
+	var pdiv = document.createElement('div');
+	pdiv.classList.add('imm-color-picker');
+	pdiv.innerHTML = '<i class="fa fa-paint-brush" aria-hidden="true"></i>';
+	nContainer.appendChild(pdiv);
+	
+	this.opened = 0;
+	
+	this.block = nContainer;
+	
+}
+
+
 
 
 
@@ -1651,6 +1682,14 @@ Imm.prototype.parseNumbers = function(pBlock){
 		var number = new IMM.NUMBER(allNumbers[i]);
 	}
 }
+Imm.prototype.parseColors = function(pBlock){
+	if(!pBlock)
+		pBlock = document;
+	var allColors = pBlock.getElementsByClassName("imm-color");
+	for(var i=0;i<allColors.length;i++){
+		var color = new IMM.COLOR(allColors[i]);
+	}
+}
 
 
 Imm.prototype.parseAll = function(pBlock){
@@ -1665,6 +1704,7 @@ Imm.prototype.parseAll = function(pBlock){
 	IMM.parseRads(pBlock);
 	IMM.parseDates(pBlock);
 	IMM.parseNumbers(pBlock);
+	IMM.parseColors(pBlock);
 }
 
 

@@ -1193,7 +1193,7 @@ textarea, .textarea{
     top: 5px;
     height: 40px;
     border-radius: 50%;
-    border: solid 3px #aaaaaa;
+    border: solid 3px #777;
     box-sizing: border-box;
     padding: 8px 0;
 	
@@ -1205,7 +1205,7 @@ textarea, .textarea{
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background-color: #aaaaaa;
+    background-color: #777;
     content: '';
 }
 .imm-number-picker > span{
@@ -1294,6 +1294,25 @@ textarea, .textarea{
 	border: solid 1px #aaa;
 }
 
+
+
+/* IMM-COLORS */
+.imm-color-container{
+	position: relative;
+}
+.imm-color-picker > i{
+	color: #777;
+}
+.imm-color-picker{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    box-sizing: border-box;
+    font-size: 24px;
+    padding: 8px;
+}
 
 
 
