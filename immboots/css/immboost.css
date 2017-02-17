@@ -1313,6 +1313,24 @@ textarea, .textarea{
     font-size: 24px;
     padding: 8px;
 }
+.imm-color-pick-container{
+	width: 250px;
+	height: 128px;
+	box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
+	top: 100%;
+	left: 0;
+	position: absolute;
+}
+.imm-c-left-canvas{
+	position: absolute;
+	left: 10px;
+	top: 10px;
+}
+.imm-c-right-canvas{
+	position: absolute;
+	right: 0;
+	top: 0;
+}
 
 
 

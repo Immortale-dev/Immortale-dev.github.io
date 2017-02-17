@@ -1573,6 +1573,76 @@ colors.prototype.activate = function(){
 	
 	this.block = nContainer;
 	
+	
+	this.cLeftWidth = 10;
+	this.cLeftHeight = 110;
+	
+	
+	o.addEventListener('blur',function(){
+		///-self.removeBlock();
+	});
+	o.addEventListener('focus',function(){
+		self.createBlock();
+	},false);
+	
+}
+colors.prototype.createBlock = function(){
+	var div = document.createElement('div');
+	div.classList.add('imm-color-pick-container');
+	var cr = document.createElement('canvas');
+	var crDiv = document.createElement('div');
+	crDiv.classList.add('imm-c-left-canvas');
+	cr.height = this.cLeftHeight;
+	cr.width = this.cLeftWidth;
+	crDiv.style.height = this.cLeftHeight+'px';
+	crDiv.style.width = this.cLeftWidth+'px';
+	crDiv.appendChild(cr);
+	div.appendChild(crDiv);
+	
+	var cl = document.createElement('canvas');
+	cl.classList.add('imm-c-right-canvas');
+	cl.height = 128;
+	cl.width = 160;
+	div.appendChild(cl);
+	
+	var ctr = cr.getContext('2d');
+	var ctl = cl.getContext('2d');
+	
+	//PALETE
+	var hGrad = ctr.createLinearGradient(0, 0, 0, cl.height);
+	hGrad.addColorStop(0 / 6, '#F00');
+	hGrad.addColorStop(1 / 6, '#FF0');
+	hGrad.addColorStop(2 / 6, '#0F0');
+	hGrad.addColorStop(3 / 6, '#0FF');
+	hGrad.addColorStop(4 / 6, '#00F');
+	hGrad.addColorStop(5 / 6, '#F0F');
+	hGrad.addColorStop(6 / 6, '#F00');
+	ctr.fillStyle = hGrad;
+	ctr.fillRect(0, 0, cr.width, cr.height);
+	
+	//DRAWED
+	ctl.fillStyle = '#f00';
+	ctl.fillRect(0,0,cl.width,cl.height);
+	var vGrad = ctl.createLinearGradient(0, 0, cl.width, 0);
+	vGrad.addColorStop(0, 'rgba(255,255,255,1)');
+	vGrad.addColorStop(1, 'rgba(255,255,255,0)');
+	ctl.fillStyle = vGrad;
+	ctl.fillRect(0,0,cl.width,cl.height);
+	
+	vGrad = ctl.createLinearGradient(0, 0, 0, cl.height);
+	vGrad.addColorStop(0, 'rgba(0,0,0,0)');
+	vGrad.addColorStop(1, 'rgba(0,0,0,1)');
+	ctl.fillStyle = vGrad;
+	ctl.fillRect(0,0,cl.width,cl.height);
+	
+	this.colorContainer = div;
+	
+	this.block.appendChild(div);
+}
+colors.prototype.removeBlock = function(){
+	if(this.colorContainer)
+		this.colorContainer.parentNode.removeChild(this.colorContainer);
+	this.colorContainer = null;
 }
 
 
