@@ -1320,6 +1320,19 @@ textarea, .textarea{
 	top: 100%;
 	left: 0;
 	position: absolute;
+	background-color: #fff;
+}
+.imm-c-left-canvas > span, .imm-c-middle-canvas > span{
+	width: 14px;
+    height: 14px;
+    position: absolute;
+    left: -2px;
+    top: 0;
+    margin-top: -7px;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 1px 0px 3px rgba(0,0,0,0.3);
+	pointer-events: none;
 }
 .imm-c-left-canvas{
 	position: absolute;
@@ -1330,6 +1343,39 @@ textarea, .textarea{
 	position: absolute;
 	right: 0;
 	top: 0;
+	overflow: hidden;
+}
+.imm-c-middle-canvas{
+	position: absolute;
+	left: 30px;
+	top: 10px;
+}
+.imm-c-right-canvas > span{
+	position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: -6px;
+    margin-right: -6px;
+    width: 12px;
+    height: 12px;
+    border: solid 1px #fff;
+    border-radius: 50%;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 3px rgba(0,0,0,0.2);	
+	pointer-events: none;
+}
+.imm-color-container > input.imm-color{
+	padding-left: 60px;
+}
+.imm-color-indec{
+    position: absolute;
+    left: 30px;
+    top: 13px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
 }
 
 
