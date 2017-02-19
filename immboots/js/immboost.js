@@ -331,7 +331,10 @@ checks.prototype._animateCircs = function(){
 		for(var i=0;i<arr.length;i++){
 			var dx = parseInt(arr[i].getAttribute('data-x'));
 			var dy = parseInt(arr[i].getAttribute('data-y'));
-			var ow = arr[i].offsetWidth;
+			var ow = arr[i].OW || 0;
+			
+			//console.log(ow,limW);
+			
 			if(ow >= limW){
 				if(arr[i].classList.contains('enabled')){
 					block.children[1].classList.add('enabled');
@@ -343,11 +346,13 @@ checks.prototype._animateCircs = function(){
 				i--;
 			}
 			else{
-				var reW = ow + Math.ceil((limW - ow) / 45);
-				arr[i].style.width = reW+'px';
-				arr[i].style.height = reW+'px';
-				arr[i].style.top = dy - reW/2+'px';
-				arr[i].style.left = dx - reW/2+'px';
+				var pmc = Math.ceil((limW - ow) / 35);
+				var reW = ow + pmc;
+				arr[i].style.width = Math.ceil(reW)+'px';
+				arr[i].style.height = Math.ceil(reW)+'px';
+				arr[i].style.top = dy - Math.ceil(reW/2)+'px';
+				arr[i].style.left = dx - Math.ceil(reW/2)+'px';
+				arr[i].OW = reW;
 			}
 		}
 		
@@ -362,7 +367,22 @@ checks.prototype._animateCircs = function(){
 	animate();
 	
 }
+checks.prototype.getLayer = function(evt) {
+  var el = evt.target,
+      x = 0,
+      y = 0;
 
+  while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+    x += el.offsetLeft - el.scrollLeft;
+    y += el.offsetTop - el.scrollTop;
+    el = el.offsetParent;
+  }
+
+  x = evt.clientX - x;
+  y = evt.clientY - y;
+
+  return { x: x, y: y };
+}
 checks.prototype.activate = function(){
 	
 	var self = this;
@@ -406,8 +426,11 @@ checks.prototype.activate = function(){
 			sCirc.className = 'imm-check-circ';
 			var addCC = o.checked ? 'enabled' : 'disabled';
 			sCirc.classList.add(addCC);
-			sCirc.setAttribute('data-x',event.offsetX || event.layerX);
-			sCirc.setAttribute('data-y',event.offsetY || event.layerY);
+			
+			var ley = self.getLayer(event);
+			
+			sCirc.setAttribute('data-x',ley.x);
+			sCirc.setAttribute('data-y',ley.y);
 			
 			selfC.appendChild(sCirc);
 			
@@ -1823,7 +1846,7 @@ colors.prototype.createBlock = function(){
 	}
 	
 	crDiv.addEventListener('mousedown',function(e){
-		self._crmmO = {v:e.layerY,y:e.pageY,m:this.offsetHeight};
+		self._crmmO = {v:self.getLayer(e).y,y:e.pageY,m:this.offsetHeight};
 		self._crmm(e);
 		window.addEventListener('mousemove',self._crmmE,false);
 		window.addEventListener('mouseup',self._crmuE,false);
@@ -1856,7 +1879,7 @@ colors.prototype.createBlock = function(){
 	}
 	
 	cmDiv.addEventListener('mousedown',function(e){
-		self._cmmmO = {v:this.offsetHeight-e.layerY,y:e.pageY,m:this.offsetHeight};
+		self._cmmmO = {v:this.offsetHeight-self.getLayer(e).y,y:e.pageY,m:this.offsetHeight};
 		self._cmmm(e);
 		window.addEventListener('mousemove',self._cmmmE,false);
 		window.addEventListener('mouseup',self._cmmuE,false);
@@ -1882,8 +1905,10 @@ colors.prototype.createBlock = function(){
 	}
 	
 	clDiv.addEventListener('mousedown',function(e){
-		self._clmmO = {vy:this.offsetHeight-e.layerY,vx:this.offsetWidth-e.layerX,y:e.pageY,x:e.pageX,my:this.offsetHeight,mx:this.offsetWidth};
+		var lev = self.getLayer(e);
+		self._clmmO = {vy:this.offsetHeight-lev.y,vx:this.offsetWidth-lev.x,y:e.pageY,x:e.pageX,my:this.offsetHeight,mx:this.offsetWidth};
 		self._clmm(e);
+		console.log(self._clmmO);
 		window.addEventListener('mousemove',self._clmmE,false);
 		window.addEventListener('mouseup',self._clmuE,false);
 	},false);
@@ -1907,6 +1932,22 @@ colors.prototype.createBlock = function(){
 	this.renderPicker(1);
 	
 	
+}
+colors.prototype.getLayer = function(evt) {
+  var el = evt.target,
+      x = 0,
+      y = 0;
+
+  while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+    x += el.offsetLeft - el.scrollLeft;
+    y += el.offsetTop - el.scrollTop;
+    el = el.offsetParent;
+  }
+
+  x = evt.clientX - x;
+  y = evt.clientY - y;
+
+  return { x: x, y: y };
 }
 colors.prototype.removeBlock = function(){
 	if(this.colorContainer)
