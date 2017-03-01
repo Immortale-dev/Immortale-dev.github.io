@@ -2164,17 +2164,35 @@ worktimes.prototype.activate = function(){
 		div.classList.add('imm-worktime-picker');
 		div.innerHTML = '<div class="imm-worktime-left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="imm-worktime-middle"></div><div class="imm-worktime-right"></div>';
 		var divMid = div.children[1];
-		divMid = '<div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
+		divMid.innerHTML = '<div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
 			'</div>';
-		var allWorkTimes = divM.getElementsByClassName("imm-workt-day");
+		var allWorkTimes = divMid.getElementsByClassName("imm-workt-day");
 		self.days = allWorkTimes;
+		dateContainer.appendChild(div);
+		
+		for(var i=1;i<=7;i++){
+			if(vArr[i]){
+				var ii = i-1;
+				for(var j=0;j<vArr[i].length;j++){
+					var fromTime = vArr[i][j][0][0]*60*60*1000 + vArr[i][j][0][1]*60*1000 + vArr[i][j][0][2]*1000;
+					var toTime = vArr[i][j][1][0]*60*60*1000 + vArr[i][j][1][1]*60*1000 + vArr[i][j][1][2]*1000;
+					var tMin = 0;
+					var tMax = 86400000;
+					var fromPerc = fromTime/tMax;
+					var toPerc = toTime/tMax;
+					var span = document.createElement('span');
+					span.style.width = (toPerc-fromPerc)+'%';
+					span.style.left = fromPerc+'%';
+				}
+			}
+		}
 		
 	},false);
 	
@@ -2205,8 +2223,8 @@ worktimes.prototype.parseValue = function(val){
 			sWArr[i][j] = sWArr[i][j].trim().split("-");
 		}
 		if(sWArr[i][1]){
-			var sWArr[i][1][0] = sWArr[i][1][0].split(':');
-			var sWArr[i][1][1] = sWArr[i][1][1] ? sWArr[i][1][1].split(':') : [0,0,0];
+			sWArr[i][1][0] = sWArr[i][1][0].split(':');
+			sWArr[i][1][1] = sWArr[i][1][1] ? sWArr[i][1][1].split(':') : [0,0,0];
 			
 			//timeFrom[0]
 			
