@@ -57,6 +57,10 @@ Imm.prototype.COLOR = function(inp){
 	this._o = inp;
 	this.activate();
 }
+Imm.prototype.WORKTIME = function(inp){
+	this._o = inp;
+	this.activate();
+}
 
 var tabs = Imm.prototype.TAB;
 var inps = Imm.prototype.INP;
@@ -67,6 +71,7 @@ var scrolls = Imm.prototype.SCROLL;
 var datepickers = Imm.prototype.DATEPICKER;
 var numbers = Imm.prototype.NUMBER;
 var colors = Imm.prototype.COLOR;
+var worktimes = Imm.prototype.WORKTIME;
 
 
 
@@ -1325,7 +1330,6 @@ datepickers.prototype.closedialog = function(){
 }
 
 
-
 ////////////////////////////////////////////////////////////////
 ///////////////////////NUMBER///////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -1578,7 +1582,7 @@ numbers.prototype.changeVis = function(){
 ////////////////////////////////////////////////////////////////
 colors.prototype.activate = function(){
 	var o = this._o;
-	this._o.DP = this;
+	this._o.CL = this;
 	var self = this;
 	
 	var nContainer = document.createElement('div');
@@ -2127,6 +2131,111 @@ colors.prototype.updateControlValues = function(){
 
 
 
+////////////////////////////////////////////////////////////////
+///////////////////////WORKTIME///////////////////////////////
+////////////////////////////////////////////////////////////////
+worktimes.prototype.activate = function(){
+	var o = this._o;
+	this._o.WT = this;
+	var self = this;
+	
+	var dateContainer = document.createElement('div');
+	dateContainer.classList.add('imm-worktime-container');
+	o.parentNode.insertBefore(dateContainer,o);
+	dateContainer.appendChild(o);
+	
+	var val = o.value.trim();
+	
+	val = this.parseValue(val);
+	
+	var vArr = this.parseArray(val);
+	
+	if(!val)
+		val = 0;
+	
+	this.value = val;
+	
+	o.addEventListener('focus',function(){
+		
+		var div = dateContainer.getElementsByClassName("imm-worktime-picker")[0];
+		if(div)
+			div.parentNode.removeChild(div);
+		div = document.createElement('div');
+		div.classList.add('imm-worktime-picker');
+		div.innerHTML = '<div class="imm-worktime-left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="imm-worktime-middle"></div><div class="imm-worktime-right"></div>';
+		var divMid = div.children[1];
+		divMid = '<div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
+			'<div class="imm-worktime-day"><div class="imm-workt-day"></div></div>'+
+			'</div>';
+		var allWorkTimes = divM.getElementsByClassName("imm-workt-day");
+		self.days = allWorkTimes;
+		
+	},false);
+	
+	var self = this;
+}
+worktimes.prototype.parseArray = function(arr){
+	var retArr = [];
+	
+	for(var i=0;i<arr.length;i++){
+		if(arr[i][0].length > 1){
+			for(var fi=arr[i][0][0];fi<=arr[i][0][1];fi++){
+				if(fi >= 1 && fi <= 7 && !retArr[fi]){
+					retArr[fi] = JSON.parse(JSON.stringify(arr[i][1]));
+				}
+			}
+		}
+	}
+	
+	return retArr;
+}
+worktimes.prototype.parseValue = function(val){
+	val = val.toString();
+	var sWArr = val.split(',');
+	var ind = 0;
+	for(var i=0;i<sWArr.length;i++){
+		sWArr[i] = sWArr[i].trim().split('.');
+		for(var j=0;j<sWArr[i].length;j++){
+			sWArr[i][j] = sWArr[i][j].trim().split("-");
+		}
+		if(sWArr[i][1]){
+			var sWArr[i][1][0] = sWArr[i][1][0].split(':');
+			var sWArr[i][1][1] = sWArr[i][1][1] ? sWArr[i][1][1].split(':') : [0,0,0];
+			
+			//timeFrom[0]
+			
+			sWArr[i][1][0][0] = parseInt(sWArr[i][1][0][0]) || 0;
+			if(sWArr[i][1][0].length > 1)
+				sWArr[i][1][0][1] = parseInt(sWArr[i][1][0][1]) || 0;
+			if(sWArr[i][1][0].length > 2)
+				sWArr[i][1][0][2] = parseInt(sWArr[i][1][0][2]) || 0;
+			
+			
+			if(sWArr[i][1].length < 2)
+				sWArr[i][1][1] = [0];
+			
+			sWArr[i][1][1][0] = parseInt(sWArr[i][1][1][0]) || 0;
+			if(sWArr[i][1][1].length > 1)
+				sWArr[i][1][1][1] = parseInt(sWArr[i][1][1][1]) || 0;
+			if(sWArr[i][1][1].length > 2)
+				sWArr[i][1][1][2] = parseInt(sWArr[i][1][1][2]) || 0;
+			
+		}
+		sWArr[i][0][0] = parseInt(sWArr[i][0][0]) || 0;
+		if(sWArr[i][0].length > 1)
+			sWArr[i][0][1] = parseInt(sWArr[i][0][1]) || 0;
+	}
+	
+	return sWArr;
+	
+}
+
 
 
 
@@ -2240,6 +2349,14 @@ Imm.prototype.parseColors = function(pBlock){
 		var color = new IMM.COLOR(allColors[i]);
 	}
 }
+Imm.prototype.parseWorktimes = function(pBlock){
+	if(!pBlock)
+		pBlock = document;
+	var allWT = pBlock.getElementsByClassName("imm-worktime");
+	for(var i=0;i<allWT.length;i++){
+		var wt = new IMM.WORKTIME(allWT[i]);
+	}
+}
 
 
 Imm.prototype.parseAll = function(pBlock){
@@ -2255,6 +2372,7 @@ Imm.prototype.parseAll = function(pBlock){
 	IMM.parseDates(pBlock);
 	IMM.parseNumbers(pBlock);
 	IMM.parseColors(pBlock);
+	IMM.parseWorktimes(pBlock);
 }
 
 
