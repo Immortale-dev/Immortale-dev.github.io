@@ -2139,27 +2139,54 @@ worktimes.prototype.activate = function(){
 	this._o.WT = this;
 	var self = this;
 	
+	this.open = 0;
+	
 	var dateContainer = document.createElement('div');
 	dateContainer.classList.add('imm-worktime-container');
 	o.parentNode.insertBefore(dateContainer,o);
 	dateContainer.appendChild(o);
 	
+	var divBut = document.createElement('div');
+	divBut.classList.add('imm-workt-button');
+	divBut.innerHTML = '<span></span>';
+	dateContainer.appendChild(divBut);
+	
 	var val = o.value.trim();
+	
+	console.log(val);
 	
 	val = this.parseValue(val);
 	
+	console.log(val);
+	
 	var vArr = this.parseArray(val);
+	
+	console.log(vArr);
+	
+	vArr = this.fixArray(vArr);
+	
+	//console.log(JSON.parse(JSON.stringify(vArr)));
 	
 	if(!val)
 		val = 0;
 	
-	this.value = val;
+	this.value = vArr;
 	
-	o.addEventListener('focus',function(){
+	divBut.addEventListener('click',function(){
+		
+		self.open = 1-self.open;
+		
 		
 		var div = dateContainer.getElementsByClassName("imm-worktime-picker")[0];
 		if(div)
 			div.parentNode.removeChild(div);
+		
+		dateContainer.classList.remove('active');
+			
+		if(!self.open)
+			return;
+		
+		dateContainer.classList.add('active');
 		div = document.createElement('div');
 		div.classList.add('imm-worktime-picker');
 		div.innerHTML = '<div class="imm-worktime-left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="imm-worktime-middle"></div><div class="imm-worktime-right"></div>';
@@ -2181,22 +2208,99 @@ worktimes.prototype.activate = function(){
 			if(vArr[i]){
 				var ii = i-1;
 				for(var j=0;j<vArr[i].length;j++){
-					var fromTime = vArr[i][j][0][0]*60*60*1000 + vArr[i][j][0][1]*60*1000 + vArr[i][j][0][2]*1000;
-					var toTime = vArr[i][j][1][0]*60*60*1000 + vArr[i][j][1][1]*60*1000 + vArr[i][j][1][2]*1000;
+					console.log(vArr[i][j]);
+					var fromTime = vArr[i][j][0];
+					var toTime = vArr[i][j][1];
+					console.log(fromTime,toTime);
 					var tMin = 0;
 					var tMax = 86400000;
 					var fromPerc = fromTime/tMax;
 					var toPerc = toTime/tMax;
 					var span = document.createElement('span');
-					span.style.width = (toPerc-fromPerc)+'%';
-					span.style.left = fromPerc+'%';
+					span.style.width = (toPerc-fromPerc)*100+'%';
+					span.style.left = fromPerc*100+'%';
+					allWorkTimes[ii].appendChild(span);
 				}
 			}
 		}
 		
+		
+		for(var i=0;i<allWorkTimes.length;i++){
+			allWorkTimes[i].addEventListener('mousedown',function(e){
+				if(e.which !== 1)
+					return;
+				if(e.target.classList.contains("imm-workt-day")){
+					
+					var pos = self.getLayer(e);
+					var startPoint = pos.x/e.target.offsetWidth;
+					var span = document.createElement('span');
+					span.style.left = startPoint*100+'%';
+					var contBlock = e.target;
+					contBlock.appendChild(span);
+					
+					self._C = {container:contBlock,block:span,pos:{x:pos.x,ox:e.pageX-pos.x}};
+					
+					window.addEventListener('mousemove',self._workdayMM,false);
+					window.addEventListener('mouseup',self._workdayMU,false);
+				}
+			},false);
+		}
+		
 	},false);
 	
-	var self = this;
+	
+	this._workdayMM = function(e){
+		
+		self._worktdayMousemove(e);
+		
+	}
+	this._workdayMU = function(e){
+		
+		self._worktdayMouseup(e);
+		
+		window.removeEventListener('mousemove',self._workdayMM,false);
+		window.removeEventListener('mouseup',self._workdayMU,false);
+	}
+	
+}
+///? Creating new time interval
+worktimes.prototype._worktdayMousemove = function(e){
+	
+	var C = this._C;
+	C.pos.ex = e.pageX - C.pos.ox;
+	
+	var p1 = C.pos.x/C.container.offsetWidth;
+	var p2 = C.pos.ex/C.container.offsetWidth;
+	
+	var nl = Math.min(p1,p2)*100;
+	var nw = Math.abs(p2-p1)*100;
+	
+	C.block.style.left = nl+'%';
+	C.block.style.width = nw+'%';
+}
+worktimes.prototype._worktdayMouseup = function(e){
+	
+	var C = this._C;
+	
+	
+	this._C = null;
+	delete this._C;
+}
+worktimes.prototype.getLayer = function(evt) {
+  var el = evt.target,
+      x = 0,
+      y = 0;
+
+  while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+    x += el.offsetLeft - el.scrollLeft;
+    y += el.offsetTop - el.scrollTop;
+    el = el.offsetParent;
+  }
+
+  x = evt.clientX - x;
+  y = evt.clientY - y;
+
+  return { x: x, y: y };
 }
 worktimes.prototype.parseArray = function(arr){
 	var retArr = [];
@@ -2205,7 +2309,14 @@ worktimes.prototype.parseArray = function(arr){
 		if(arr[i][0].length > 1){
 			for(var fi=arr[i][0][0];fi<=arr[i][0][1];fi++){
 				if(fi >= 1 && fi <= 7 && !retArr[fi]){
-					retArr[fi] = JSON.parse(JSON.stringify(arr[i][1]));
+					retArr[fi] = JSON.parse(JSON.stringify(arr[i].slice(1,arr[i].length)));
+				}
+			}
+		}
+		else{
+			for(var fi=arr[i][0][0];fi<=arr[i][0][0];fi++){
+				if(fi >= 1 && fi <= 7 && !retArr[fi]){
+					retArr[fi] = JSON.parse(JSON.stringify(arr[i].slice(1,arr[i].length)));
 				}
 			}
 		}
@@ -2213,6 +2324,79 @@ worktimes.prototype.parseArray = function(arr){
 	
 	return retArr;
 }
+
+worktimes.prototype.fixArray = function(arr){
+	
+	for(var i=1;i<=7;i++){
+		
+		if(!arr[i]){
+			arr[i] = [];
+			continue;
+		}
+		
+		
+		for(var j=0;j<arr[i].length;j++){
+			
+			if(!arr[i][j][0][0])
+				arr[i][j][0][0] = 0;
+			if(!arr[i][j][0][1])
+				arr[i][j][0][1] = 0;
+			if(!arr[i][j][0][2])
+				arr[i][j][0][2] = 0;
+			if(!arr[i][j][1][0])
+				arr[i][j][1][0] = 0;
+			if(!arr[i][j][1][1])
+				arr[i][j][1][1] = 0;
+			if(!arr[i][j][1][2])
+				arr[i][j][1][2] = 0;
+			
+			var startVal = arr[i][j][0][0]*60*60*1000 + arr[i][j][0][1]*60*1000 + arr[i][j][0][2]*1000;
+			var endVal = arr[i][j][1][0]*60*60*1000 + arr[i][j][1][1]*60*1000 + arr[i][j][1][2]*1000;
+			
+			console.log(startVal,endVal);
+			
+			arr[i][j][0] = startVal;
+			arr[i][j][1] = endVal;
+			
+			if(arr[i][j][0] < 0 || arr[i][j][1] < 0 || arr[i][j][0] > 86400000 || arr[i][j][1] > 86400000 || arr[i][j][0] >= arr[i][j][1]){
+				arr[i].splice(j,1);
+				j--;
+				continue;
+			}
+			
+			for(var k=0;k<j;k++){
+				if(arr[i][k][0] <= arr[i][j][0] && arr[i][k][1] >= arr[i][j][1]){
+					arr[i].splice(j,1);
+					j--;
+					break;
+				}
+				else if(arr[i][k][0] >= arr[i][j][0] && arr[i][k][1] <= arr[i][j][1]){
+					arr[i].splice(k,1);
+					j--;
+					k--;
+				}
+				else if(arr[i][k][0] < arr[i][j][0] && arr[i][k][1] < arr[i][j][1] && arr[i][k][1] >= arr[i][j][0]){
+					arr[i][j][0] = arr[i][k][0];
+					arr[i].splice(k,1);
+					j--;
+					k--;
+				}
+				else if(arr[i][k][0] > arr[i][j][0] && arr[i][k][1] > arr[i][j][1] && arr[i][k][0] <= arr[i][j][1]){
+					arr[i][j][1] = arr[i][k][1];
+					arr[i].splice(k,1);
+					j--;
+					k--;
+				}
+			}
+			
+		}
+		
+	}
+	
+	return arr;
+	
+}
+
 worktimes.prototype.parseValue = function(val){
 	val = val.toString();
 	var sWArr = val.split(',');
@@ -2222,28 +2406,32 @@ worktimes.prototype.parseValue = function(val){
 		for(var j=0;j<sWArr[i].length;j++){
 			sWArr[i][j] = sWArr[i][j].trim().split("-");
 		}
-		if(sWArr[i][1]){
-			sWArr[i][1][0] = sWArr[i][1][0].split(':');
-			sWArr[i][1][1] = sWArr[i][1][1] ? sWArr[i][1][1].split(':') : [0,0,0];
-			
-			//timeFrom[0]
-			
-			sWArr[i][1][0][0] = parseInt(sWArr[i][1][0][0]) || 0;
-			if(sWArr[i][1][0].length > 1)
-				sWArr[i][1][0][1] = parseInt(sWArr[i][1][0][1]) || 0;
-			if(sWArr[i][1][0].length > 2)
-				sWArr[i][1][0][2] = parseInt(sWArr[i][1][0][2]) || 0;
-			
-			
-			if(sWArr[i][1].length < 2)
-				sWArr[i][1][1] = [0];
-			
-			sWArr[i][1][1][0] = parseInt(sWArr[i][1][1][0]) || 0;
-			if(sWArr[i][1][1].length > 1)
-				sWArr[i][1][1][1] = parseInt(sWArr[i][1][1][1]) || 0;
-			if(sWArr[i][1][1].length > 2)
-				sWArr[i][1][1][2] = parseInt(sWArr[i][1][1][2]) || 0;
-			
+		for(var j=1;j<sWArr[i].length;j++){
+			if(sWArr[i][j]){
+
+				sWArr[i][j][0] = sWArr[i][j][0].split(':');
+				sWArr[i][j][1] = sWArr[i][j][1] ? sWArr[i][j][1].split(':') : [0,0,0];
+				
+				//timeFrom[0]
+				//console.log('W',sWArr[i][j]);
+				
+				sWArr[i][j][0][0] = parseInt(sWArr[i][j][0][0]) || 0;
+				if(sWArr[i][j][0].length > 1)
+					sWArr[i][j][0][1] = parseInt(sWArr[i][j][0][1]) || 0;
+				if(sWArr[i][j][0].length > 2)
+					sWArr[i][j][0][2] = parseInt(sWArr[i][j][0][2]) || 0;
+				
+				
+				if(sWArr[i][j].length < 2)
+					sWArr[i][j][1] = [0];
+				
+				sWArr[i][j][1][0] = parseInt(sWArr[i][j][1][0]) || 0;
+				if(sWArr[i][j][1].length > 1)
+					sWArr[i][j][1][1] = parseInt(sWArr[i][j][1][1]) || 0;
+				if(sWArr[i][j][1].length > 2)
+					sWArr[i][j][1][2] = parseInt(sWArr[i][j][1][2]) || 0;
+				
+			}
 		}
 		sWArr[i][0][0] = parseInt(sWArr[i][0][0]) || 0;
 		if(sWArr[i][0].length > 1)
