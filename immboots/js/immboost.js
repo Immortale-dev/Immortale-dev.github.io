@@ -2146,6 +2146,8 @@ worktimes.prototype.activate = function(){
 	o.parentNode.insertBefore(dateContainer,o);
 	dateContainer.appendChild(o);
 	
+	this.container = dateContainer;
+	
 	var divBut = document.createElement('div');
 	divBut.classList.add('imm-workt-button');
 	divBut.innerHTML = '<span></span>';
@@ -2192,44 +2194,26 @@ worktimes.prototype.activate = function(){
 		div.innerHTML = '<div class="imm-worktime-left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="imm-worktime-middle"></div><div class="imm-worktime-right"></div>';
 		var divMid = div.children[1];
 		divMid.innerHTML = '<div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
-			'<div class="imm-worktime-day"><div class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div data-day="1" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div data-day="2" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div data-day="3" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div data-day="4" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div data-day="5" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div data-day="6" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
+			'<div class="imm-worktime-day"><div data-day="7" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
 			'</div>';
 		var allWorkTimes = divMid.getElementsByClassName("imm-workt-day");
 		self.days = allWorkTimes;
 		dateContainer.appendChild(div);
-		
-		for(var i=1;i<=7;i++){
-			if(vArr[i]){
-				var ii = i-1;
-				for(var j=0;j<vArr[i].length;j++){
-					console.log(vArr[i][j]);
-					var fromTime = vArr[i][j][0];
-					var toTime = vArr[i][j][1];
-					console.log(fromTime,toTime);
-					var tMin = 0;
-					var tMax = 86400000;
-					var fromPerc = fromTime/tMax;
-					var toPerc = toTime/tMax;
-					var span = document.createElement('span');
-					span.style.width = (toPerc-fromPerc)*100+'%';
-					span.style.left = fromPerc*100+'%';
-					allWorkTimes[ii].appendChild(span);
-				}
-			}
-		}
-		
 		
 		for(var i=0;i<allWorkTimes.length;i++){
 			allWorkTimes[i].addEventListener('mousedown',function(e){
 				if(e.which !== 1)
 					return;
 				if(e.target.classList.contains("imm-workt-day")){
+					
+					if(self._C)
+						return;
 					
 					var pos = self.getLayer(e);
 					var startPoint = pos.x/e.target.offsetWidth;
@@ -2245,6 +2229,8 @@ worktimes.prototype.activate = function(){
 				}
 			},false);
 		}
+		
+		self.buildDays();
 		
 	},false);
 	
@@ -2269,6 +2255,11 @@ worktimes.prototype._worktdayMousemove = function(e){
 	var C = this._C;
 	C.pos.ex = e.pageX - C.pos.ox;
 	
+	if(C.pos.ex < 0)
+		C.pos.ex = 0;
+	if(C.pos.ex > C.container.offsetWidth)
+		C.pos.ex = C.container.offsetWidth;
+	
 	var p1 = C.pos.x/C.container.offsetWidth;
 	var p2 = C.pos.ex/C.container.offsetWidth;
 	
@@ -2282,9 +2273,285 @@ worktimes.prototype._worktdayMouseup = function(e){
 	
 	var C = this._C;
 	
+	var p1 = C.pos.x/C.container.offsetWidth;
+	var p2 = C.pos.ex/C.container.offsetWidth;
+	
+	if(p1 > p2)
+		p1 = [p2,p2=p1][0];
+	
+	var oneDay = 86400000;
+	var oneMin = 60000;
+	
+	var startTime = Math.floor((oneDay*p1)/oneMin)*oneMin;
+	var endTime = Math.floor((oneDay*p2)/oneMin)*oneMin;
+	
+	var day = C.container.getAttribute('data-day');
+	
+	this.value[day].push([startTime,endTime]);
+	
+	this.value = this.fixArray(this.value);
+	
+	this.clearDays();
+	this.buildDays();
 	
 	this._C = null;
 	delete this._C;
+}
+worktimes.prototype.clearDays = function(){
+	console.log(this.days);
+	for(var i=0;i<this.days.length;i++){
+		while(this.days[i].children.length)
+			this.days[i].removeChild(this.days[i].children[0]);
+	}
+}
+worktimes.prototype.buildDays = function(){
+	var self = this;
+	var vArr = this.value;
+	var allWorkTimes = this.days;
+	for(var i=1;i<=7;i++){
+		if(vArr[i]){
+			var ii = i-1;
+			for(var j=0;j<vArr[i].length;j++){
+				console.log(vArr[i][j]);
+				var fromTime = vArr[i][j][0];
+				var toTime = vArr[i][j][1];
+				console.log(fromTime,toTime);
+				var tMin = 0;
+				var tMax = 86400000;
+				var fromPerc = fromTime/tMax;
+				var toPerc = toTime/tMax;
+				var span = document.createElement('span');
+				span.style.width = (toPerc-fromPerc)*100+'%';
+				span.style.left = fromPerc*100+'%';
+				//span.setAttribute('tabindex','1');
+				span.addEventListener('click',function(){
+					if(self._C)
+						return;
+					var leftMove = document.createElement('span');
+					var rightMove = document.createElement('span');
+					leftMove.className = 'imm-wt-mover imm-wt-prevent imm-wt-mover-left';
+					rightMove.className = 'imm-wt-mover imm-wt-prevent imm-wt-mover-right';
+					var leftI = document.createElement('input');
+					var rightI = document.createElement('input');
+					leftI.setAttribute('type','text');
+					rightI.setAttribute('type','text');
+					leftI.className = 'imm-wt-prevent imm-wt-mover-input imm-wt-mover-input-left';
+					rightI.className = 'imm-wt-prevent imm-wt-mover-input imm-wt-mover-input-right';
+					var ind = Array.prototype.indexOf.call(this.parentNode.children,this);
+					var dayN = this.parentNode.getAttribute('data-day');
+					var cS = self.getCorrectTime(self.value[dayN][ind][0]);
+					var cE = self.getCorrectTime(self.value[dayN][ind][1]);
+					leftI.value = cS[0]+':'+cS[1];
+					rightI.value = cE[0]+':'+cE[1];
+					this.appendChild(leftMove);
+					this.appendChild(rightMove);
+					this.appendChild(leftI);
+					this.appendChild(rightI);
+					leftMove.addEventListener('mousedown',function(e){
+						e.preventDefault();
+						var oneDay = 86400000;
+						var startVal = self.value[dayN][self._C.ind][0]/oneDay;
+						var widthVal = (self.value[dayN][self._C.ind][1]-startVal)/oneDay;
+						self._C.mo = {d:-1,x:e.pageX,ox:startVal,ow:widthVal};
+						window.addEventListener('mousemove',_moveSpanHelper,false);
+						window.addEventListener('mouseup',_upSpanHelper,false);
+					},false);
+					rightMove.addEventListener('mousedown',function(e){
+						e.preventDefault();
+						var oneDay = 86400000;
+						var startVal = self.value[dayN][self._C.ind][0]/oneDay;
+						var widthVal = (self.value[dayN][self._C.ind][1]-startVal)/oneDay;
+						self._C.mo = {d:1,x:e.pageX,ox:startVal,ow:widthVal};
+						window.addEventListener('mousemove',_moveSpanHelper,false);
+						window.addEventListener('mouseup',_upSpanHelper,false);
+					},false);
+					leftI.addEventListener('change',function(){
+						this.value = this.value.trim();
+						var v = this.value;
+						if(v.indexOf(":")+1){
+							v = v.split(":");
+							v = ((parseInt(v[0])||0)*3600)+((parseInt(v[1])||0)*60);
+						}
+						else{
+							if(v.length > 4)
+								v = 24*3600*1000;
+							else if(v.length == 4)
+								v = parseInt(v.substr(0,2))*3600+parseInt(v.substr(2))*60;
+							else if(v.length == 3)
+								v = parseInt(v.substr(0,1))*3600+parseInt(v.substr(1))*60;
+							else if(v.length < 3)
+								v = (parseInt(v)||0)*3600;
+						}
+						if(v > 86400)
+							v = 86400;
+						v*=1000;
+						
+						if(v > self.value[dayN][ind][1])
+							v = self.value[dayN][ind][1];
+						
+						self.value[dayN][ind][0] = v;
+						
+						var oneDay = 86400000;
+						//var startVal = self.value[dayN][self._C.ind][0]/oneDay;
+						var endVal = self.value[dayN][self._C.ind][1]/oneDay;
+						
+						self._C.block.style.left = (v/oneDay)*100+'%';
+						self._C.block.style.width = (endVal-(v/oneDay))*100+'%';
+						
+						
+						var rv = self.getCorrectTime(v);
+						this.value = rv[0]+':'+rv[1];
+					},false);
+					rightI.addEventListener('change',function(){
+						this.value = this.value.trim();
+						var v = this.value;
+						if(v.indexOf(":")+1){
+							v = v.split(":");
+							v = ((parseInt(v[0])||0)*3600)+((parseInt(v[1])||0)*60);
+						}
+						else{
+							if(v.length > 4)
+								v = 24*3600*1000;
+							else if(v.length == 4)
+								v = parseInt(v.substr(0,2))*3600+parseInt(v.substr(2))*60;
+							else if(v.length == 3)
+								v = parseInt(v.substr(0,1))*3600+parseInt(v.substr(1))*60;
+							else if(v.length < 3)
+								v = (parseInt(v)||0)*3600;
+						}
+						if(v > 86400)
+							v = 86400;
+						v*=1000;
+						
+						if(v < self.value[dayN][ind][0])
+							v = self.value[dayN][ind][0];
+						
+						self.value[dayN][ind][1] = v;
+						
+						var oneDay = 86400000;
+						
+						var startVal = self.value[dayN][self._C.ind][0]/oneDay;
+						//var endVal = self.value[dayN][self._C.ind][1]/oneDay;
+						
+						self._C.block.style.left = (startVal)*100+'%';
+						self._C.block.style.width = ((v/oneDay)-startVal)*100+'%';
+						
+						
+						var rv = self.getCorrectTime(v);
+						this.value = rv[0]+':'+rv[1];
+					},false);
+					self._C = {block:this,ind:ind};
+					self.container.addEventListener('mousedown',removeHelpers,false);
+				},false);
+				allWorkTimes[ii].appendChild(span);
+			}
+		}
+	}
+	function removeHelpers(e){
+		if(e.target.classList.contains('imm-wt-prevent'))
+			return;
+		while(self._C.block.children.length){
+			self._C.block.removeChild(self._C.block.children[0]);
+		}
+		self.container.removeEventListener('mousedown',removeHelpers,false);
+		
+		self.value = self.fixArray(self.value);
+		self.clearDays();
+		self.buildDays();
+		
+		self._C = null;
+		delete self._C;
+	}
+	function _moveSpanHelper(e){
+		
+		var nx = e.pageX;
+		var C = self._C;
+		
+		var goff = C.block.parentNode.offsetWidth;
+		
+		if(C.mo.d < 0){
+			
+			var tWid = (nx-C.mo.x)/goff;
+			
+			var newLeft = tWid+C.mo.ox;
+			
+			if(newLeft < 0){
+				tWid -= newLeft;
+				newLeft = 0;
+			}
+			
+			var newWidth = -tWid+C.mo.ow-C.mo.ox;
+			
+			if(newWidth < 0){
+				newLeft += newWidth;
+				newWidth = 0;
+			}
+		}
+		else{
+			var newLeft = C.mo.ox;
+			var newWidth = (nx-C.mo.x)/goff+C.mo.ow - C.mo.ox;
+			
+			//console.log((nx-C.mo.x));
+			
+			if(newWidth < 0){
+				newWidth = 0;
+			}
+			if(newLeft + newWidth > 1){
+				newWidth = 1-newLeft;
+			}
+		}
+		
+		
+		var oneDay = 86400000;
+		var oneMin = 60000;
+		
+		var startTime = Math.round((oneDay*newLeft)/oneMin)*oneMin;
+		var endTime = Math.round((oneDay*(newLeft+newWidth))/oneMin)*oneMin;
+		
+		var day = C.block.parentNode.getAttribute('data-day');
+		
+		self.value[day][C.ind][0] = startTime;
+		self.value[day][C.ind][1] = endTime;
+		
+		
+		
+		var sTime = self.getCorrectTime(startTime);
+		var eTime = self.getCorrectTime(endTime);
+		
+		C.block.children[2].value = sTime[0]+':'+sTime[1];
+		C.block.children[3].value = eTime[0]+':'+eTime[1];
+
+		
+		
+		C.block.style.left = (newLeft*100)+'%';
+		C.block.style.width = (newWidth*100)+'%';
+		
+	}
+	function _upSpanHelper(e){
+		
+		var C = self._C;
+		
+		var p1 = C.block.offsetLeft/C.block.parentNode.offsetWidth;
+		var p2 = (C.block.offsetLeft+C.block.offsetWidth)/C.block.parentNode.offsetWidth;
+
+		console.log(self.value);
+		
+		self._C.mo = null;
+		delete self._C.mo;
+		
+		window.removeEventListener('mousemove',_moveSpanHelper,false);
+		window.removeEventListener('mouseup',_upSpanHelper,false);
+	}
+}
+worktimes.prototype.getCorrectTime = function(ts){
+	var ts = Math.floor(ts/1000);
+	var sH = Math.floor(ts/3600);
+	var sM = (ts-sH*3600)/60;
+	
+	if(sM < 10)
+		sM = '0'+sM;
+	
+	return [sH,sM];
 }
 worktimes.prototype.getLayer = function(evt) {
   var el = evt.target,
@@ -2322,6 +2589,37 @@ worktimes.prototype.parseArray = function(arr){
 		}
 	}
 	
+	for(var i=1;i<=7;i++){
+		
+		if(!retArr[i]){
+			retArr[i] = [];
+			continue;
+		}
+		
+		for(var j=0;j<retArr[i].length;j++){
+			
+			if(!retArr[i][j][0][0])
+				retArr[i][j][0][0] = 0;
+			if(!retArr[i][j][0][1])
+				retArr[i][j][0][1] = 0;
+			if(!retArr[i][j][0][2])
+				retArr[i][j][0][2] = 0;
+			if(!retArr[i][j][1][0])
+				retArr[i][j][1][0] = 0;
+			if(!retArr[i][j][1][1])
+				retArr[i][j][1][1] = 0;
+			if(!retArr[i][j][1][2])
+				retArr[i][j][1][2] = 0;
+			
+			var startVal = retArr[i][j][0][0]*60*60*1000 + retArr[i][j][0][1]*60*1000 + retArr[i][j][0][2]*1000;
+			var endVal = retArr[i][j][1][0]*60*60*1000 + retArr[i][j][1][1]*60*1000 + retArr[i][j][1][2]*1000;
+			
+			retArr[i][j][0] = startVal;
+			retArr[i][j][1] = endVal;
+		}
+		
+	}
+	
 	return retArr;
 }
 
@@ -2329,34 +2627,7 @@ worktimes.prototype.fixArray = function(arr){
 	
 	for(var i=1;i<=7;i++){
 		
-		if(!arr[i]){
-			arr[i] = [];
-			continue;
-		}
-		
-		
 		for(var j=0;j<arr[i].length;j++){
-			
-			if(!arr[i][j][0][0])
-				arr[i][j][0][0] = 0;
-			if(!arr[i][j][0][1])
-				arr[i][j][0][1] = 0;
-			if(!arr[i][j][0][2])
-				arr[i][j][0][2] = 0;
-			if(!arr[i][j][1][0])
-				arr[i][j][1][0] = 0;
-			if(!arr[i][j][1][1])
-				arr[i][j][1][1] = 0;
-			if(!arr[i][j][1][2])
-				arr[i][j][1][2] = 0;
-			
-			var startVal = arr[i][j][0][0]*60*60*1000 + arr[i][j][0][1]*60*1000 + arr[i][j][0][2]*1000;
-			var endVal = arr[i][j][1][0]*60*60*1000 + arr[i][j][1][1]*60*1000 + arr[i][j][1][2]*1000;
-			
-			console.log(startVal,endVal);
-			
-			arr[i][j][0] = startVal;
-			arr[i][j][1] = endVal;
 			
 			if(arr[i][j][0] < 0 || arr[i][j][1] < 0 || arr[i][j][0] > 86400000 || arr[i][j][1] > 86400000 || arr[i][j][0] >= arr[i][j][1]){
 				arr[i].splice(j,1);
