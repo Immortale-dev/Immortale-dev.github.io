@@ -11,6 +11,10 @@ var Imm = function(){
 		tabs:[]
 	};
 	
+	this.lang = {
+		days:["M","T","W","T","F","S","S"]
+	};
+	
 }
 
 var IMM = new Imm();
@@ -2139,6 +2143,10 @@ worktimes.prototype.activate = function(){
 	this._o.WT = this;
 	var self = this;
 	
+	o.addEventListener('change',function(){
+		self.fromInput();
+	},false);
+	
 	this.open = 0;
 	
 	var dateContainer = document.createElement('div');
@@ -2150,27 +2158,24 @@ worktimes.prototype.activate = function(){
 	
 	var divBut = document.createElement('div');
 	divBut.classList.add('imm-workt-button');
-	divBut.innerHTML = '<span></span>';
+	divBut.innerHTML = '<i class="fa fa-clock-o" aria-hidden="true"></i>';
 	dateContainer.appendChild(divBut);
 	
 	var val = o.value.trim();
 	
-	console.log(val);
+	//console.log(val);
 	
 	val = this.parseValue(val);
 	
-	console.log(val);
+	//console.log(val);
 	
 	var vArr = this.parseArray(val);
 	
-	console.log(vArr);
+	//console.log(vArr);
 	
 	vArr = this.fixArray(vArr);
 	
 	//console.log(JSON.parse(JSON.stringify(vArr)));
-	
-	if(!val)
-		val = 0;
 	
 	this.value = vArr;
 	
@@ -2191,9 +2196,9 @@ worktimes.prototype.activate = function(){
 		dateContainer.classList.add('active');
 		div = document.createElement('div');
 		div.classList.add('imm-worktime-picker');
-		div.innerHTML = '<div class="imm-worktime-left"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="imm-worktime-middle"></div><div class="imm-worktime-right"></div>';
+		div.innerHTML = '<div class="imm-worktime-left"><span>'+IMM.lang.days[0]+'</span><span>'+IMM.lang.days[1]+'</span><span>'+IMM.lang.days[2]+'</span><span>'+IMM.lang.days[3]+'</span><span>'+IMM.lang.days[4]+'</span><span>'+IMM.lang.days[5]+'</span><span>'+IMM.lang.days[6]+'</span></div><div class="imm-worktime-middle"></div><div class="imm-worktime-right"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';
 		var divMid = div.children[1];
-		divMid.innerHTML = '<div>'+
+		divMid.innerHTML = '<div class="imm-worktime-mid-days">'+
 			'<div class="imm-worktime-day"><div data-day="1" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
 			'<div class="imm-worktime-day"><div data-day="2" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
 			'<div class="imm-worktime-day"><div data-day="3" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
@@ -2201,11 +2206,34 @@ worktimes.prototype.activate = function(){
 			'<div class="imm-worktime-day"><div data-day="5" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
 			'<div class="imm-worktime-day"><div data-day="6" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
 			'<div class="imm-worktime-day"><div data-day="7" class="imm-workt-day"></div><div class="imm-workt-meter"></div></div>'+
-			'</div>';
+			'</div><div class="imm-worktime-mid-panel"></div>';
 		var allWorkTimes = divMid.getElementsByClassName("imm-workt-day");
+		var allMeters = divMid.getElementsByClassName("imm-workt-meter");
+		var panelDiv = divMid.getElementsByClassName("imm-worktime-mid-panel")[0];
 		self.days = allWorkTimes;
 		dateContainer.appendChild(div);
-		
+		var allCross = div.children[2].children;
+
+		for(var i=0;i<allCross.length;i++){
+			allCross[i].addEventListener('click',function(){
+				var iind = Array.prototype.indexOf.call(this.parentNode.children,this)+1;
+				self.value[iind] = [];
+				self.clearDays();
+				self.buildDays();
+			},false);
+		}
+		for(var i=0;i<allMeters.length;i++){
+			for(var j=0;j<13;j++){
+				var span = document.createElement('span');
+				span.style.left = (j*8.3333)+'%';
+				allMeters[i].appendChild(span);	
+			}
+		}
+		for(var i=0;i<13;i++){
+			var span = document.createElement('span');
+			span.innerHTML = (i*2)+'';
+			panelDiv.appendChild(span);	
+		}
 		for(var i=0;i<allWorkTimes.length;i++){
 			allWorkTimes[i].addEventListener('mousedown',function(e){
 				if(e.which !== 1)
@@ -2227,6 +2255,29 @@ worktimes.prototype.activate = function(){
 					window.addEventListener('mousemove',self._workdayMM,false);
 					window.addEventListener('mouseup',self._workdayMU,false);
 				}
+			},false);
+			allWorkTimes[i].addEventListener('mousemove',function(e){
+				if(e.target.classList.contains('imm-workt-day')){
+					var dI = this.parentNode.children[1].getElementsByClassName('imm-wt-time-hover')[0];
+					if(!dI){
+						dI = document.createElement('i');
+						dI.classList.add('imm-wt-time-hover');
+						this.parentNode.children[1].appendChild(dI);
+					}
+					dI.style.left = (self.getLayer(e,this).x/this.offsetWidth)*100+'%';
+					var rdT = self.getCorrectTime((self.getLayer(e,this).x/this.offsetWidth)*86400000);
+					dI.innerHTML = '<b>'+rdT[0]+':'+rdT[1]+'</b>';
+				}
+				else{
+					var allD = this.parentNode.children[1].getElementsByClassName('imm-wt-time-hover');
+					for(var i=0;i<allD.length;i++)
+						allD[i].parentNode.removeChild(allD[i]);
+				}
+			},false);
+			allWorkTimes[i].addEventListener('mouseleave',function(e){
+				var allD = this.parentNode.children[1].getElementsByClassName('imm-wt-time-hover');
+				for(var i=0;i<allD.length;i++)
+					allD[i].parentNode.removeChild(allD[i]);
 			},false);
 		}
 		
@@ -2268,6 +2319,50 @@ worktimes.prototype._worktdayMousemove = function(e){
 	
 	C.block.style.left = nl+'%';
 	C.block.style.width = nw+'%';
+}
+worktimes.prototype.fromInput = function(){
+	
+	var val = this._o.value.trim();
+	
+	val = this.parseValue(val);
+	
+	var vArr = this.parseArray(val);
+	
+	vArr = this.fixArray(vArr);
+	
+	this.value = vArr;
+	
+	this.clearDays();
+	this.buildDays();
+}
+worktimes.prototype.decodeValue = function(){
+	var retArr = [];
+	for(var i=1;i<=7;){
+		var endP = i;
+		if(this.value[i].length){
+			endP = 7;
+			var rArr = [];
+			for(var j=0;j<this.value[i].length;j++){
+				var rtS = this.getCorrectTime(this.value[i][j][0]);
+				if(!parseInt(rtS[1]))
+					rtS.splice(1,1);
+				var rtE = this.getCorrectTime(this.value[i][j][1]);
+				if(!parseInt(rtE[1]))
+					rtE.splice(1,1);
+				rArr.push(rtS.join(':')+'-'+rtE.join(':'));
+				for(var k=endP;k>i;k--){
+					if(!this.value[k].length || !this.value[k][j] || this.value[i][j][0] != this.value[k][j][0] || this.value[i][j][1] != this.value[k][j][1])
+						endP = k-1;
+				}
+			}
+			var istr = i.toString();
+			if(i != endP)
+				istr += '-'+endP;
+			retArr.push(istr+'.'+rArr.join('.'));
+		}
+		i = endP+1;
+	}
+	this._o.value = retArr.join(',');
 }
 worktimes.prototype._worktdayMouseup = function(e){
 	
@@ -2323,10 +2418,15 @@ worktimes.prototype.buildDays = function(){
 				var span = document.createElement('span');
 				span.style.width = (toPerc-fromPerc)*100+'%';
 				span.style.left = fromPerc*100+'%';
+				var rsTime = this.getCorrectTime(fromTime);
+				var reTime = this.getCorrectTime(toTime);
+				span.setAttribute('data-s',rsTime[0]+':'+rsTime[1]);
+				span.setAttribute('data-e',reTime[0]+':'+reTime[1]);
 				//span.setAttribute('tabindex','1');
 				span.addEventListener('click',function(){
 					if(self._C)
 						return;
+					this.classList.add('active');
 					var leftMove = document.createElement('span');
 					var rightMove = document.createElement('span');
 					leftMove.className = 'imm-wt-mover imm-wt-prevent imm-wt-mover-left';
@@ -2447,6 +2547,7 @@ worktimes.prototype.buildDays = function(){
 			}
 		}
 	}
+	this.decodeValue();
 	function removeHelpers(e){
 		if(e.target.classList.contains('imm-wt-prevent'))
 			return;
@@ -2546,15 +2647,15 @@ worktimes.prototype.buildDays = function(){
 worktimes.prototype.getCorrectTime = function(ts){
 	var ts = Math.floor(ts/1000);
 	var sH = Math.floor(ts/3600);
-	var sM = (ts-sH*3600)/60;
+	var sM = Math.floor((ts-sH*3600)/60);
 	
 	if(sM < 10)
-		sM = '0'+sM;
+		sM = '0'+(sM);
 	
 	return [sH,sM];
 }
-worktimes.prototype.getLayer = function(evt) {
-  var el = evt.target,
+worktimes.prototype.getLayer = function(evt,block) {
+  var el = block || evt.target,
       x = 0,
       y = 0;
 
