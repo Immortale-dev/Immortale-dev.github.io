@@ -1,0 +1,254 @@
+
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+<link rel="stylesheet" href="./lib/immboost.css">
+<link rel="stylesheet" href="./main.css">
+
+<div class="wrapper f-h dflex">
+	<div class="wrapper-left">
+		<div class="load-bg f-h">
+			<div class="noise"></div>
+			<div id="load"></div>
+		</div>
+	</div>
+	<div class="wrapper-right">
+		<div class="imm-scroll f-h">
+			<div class="settings-block">
+				<div class="container-s">
+					<div class="p-10">
+						<div class="settings-env settings-section">
+							<h2>Environment Settings</h2>
+							<div class="settings-body">
+								<div class="settings-area">
+									<div class="pad-w-3 cfix">
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Noise</p>
+												</div>
+												<div>
+													<input type="text" class="imm-slider set-noise" data-min="0" data-max="0.1" data-step="0.001" value="0.025">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group">
+												<div>
+													<p>Background Color</p>
+												</div>
+												<div>
+													<input type="text" class="imm-color set-bg" value="#111">
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="settings-loader settings-section">
+							<h2>Loader Settings</h2>
+							<div class="settings-body">
+								<div class="settings-area">
+									<div class="pad-w-3 cfix">
+										<div class="b-w-6">
+											<div class="settings-group">
+												<div>
+													<p>Birth Color</p>
+												</div>
+												<div>
+													<input type="text" class="imm-color l-set" data-name="color" data-type="public" value="">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group">
+												<div>
+													<p>Fade Color</p>
+												</div>
+												<div>
+													<input type="text" class="imm-color l-set" data-name="fadeColor" data-type="public" value="">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-12">
+											<div class="settings-group">
+												<div>
+													<p>Gap Color</p>
+												</div>
+												<div>
+													<input type="text" class="imm-color l-set" data-name="gapColor" data-type="public" value="">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Speed Coof</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="0" data-max="5" data-step="0.01" class="imm-slider l-set" data-name="speed" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Scale Coof</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="0" data-max="5" data-step="0.01" class="imm-slider l-set" data-name="scale" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="settings-loader settings-section">
+							<h2>Advanced Loader Settings</h2>
+							<div class="settings-body">
+								<div class="settings-area">
+									<div class="pad-w-3 cfix">
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Visible Line Length</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="10" data-max="1000" data-step="1" class="imm-slider l-set" data-name="maxLength" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Line Width</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="1" data-max="50" data-step="1" class="imm-slider l-set" data-name="lineWidth" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Long Line Length</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="10" data-max="200" data-step="1" class="imm-slider l-set" data-name="longLineLength" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Short Line Length</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="10" data-max="200" data-step="1" class="imm-slider l-set" data-name="shortLineLength" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Fast Rotation Angle (deg)</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertToDeg" data-min="0" data-max="360" data-step="1" class="imm-slider l-set" data-name="fastRotateAngle" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Slow Rotation Angle (deg)</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertToDeg" data-min="0" data-max="360" data-step="1" class="imm-slider l-set" data-name="slowRotateAngle" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Long Line Time (ms)</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="0" data-max="5000" data-step="5" class="imm-slider l-set" data-name="longLineTime" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Short Line Time (ms)</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="0" data-max="5000" data-step="5" class="imm-slider l-set" data-name="shortLineTime" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Fast Rotation Time (ms)</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="0" data-max="5000" data-step="5" class="imm-slider l-set" data-name="fastRotateTime" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Slow Rotation Time (ms)</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="0" data-max="5000" data-step="5" class="imm-slider l-set" data-name="slowRotateTime" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Gap Time (ms)</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="0" data-max="5000" data-step="5" class="imm-slider l-set" data-name="gapTime" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+										<div class="b-w-6">
+											<div class="settings-group sldier-group">
+												<div>
+													<p>Gap Width</p>
+												</div>
+												<div>
+													<input type="text" data-mw="convertNums" data-min="0" data-max="50" data-step="1" class="imm-slider l-set" data-name="gapWidth" data-type="public" value="0">
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<a href="https://github.com/webdeveloperukraine/acloader" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="./lib/l.js"></script>
+<script src="./lib/immboost.js"></script>
+<script src="./main.js"></script>
+<script>
+	var l = new ACOLoading();
+	document.querySelector('#load').appendChild(l.DOM);
+	getSettings(l);
+	l.play();
+	IMM.parseAll();
+</script>
