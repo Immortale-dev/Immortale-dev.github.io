@@ -1,0 +1,124 @@
+<style>
+body{
+	margin: 0;
+	padding: 0;
+}
+</style>
+<canvas id="c"></canvas>
+
+<script>
+	
+	(function(){		
+		const W = 150;
+		const color = '#424242';
+		const radius = W/2;
+		const thick = radius/(W/Math.PI);
+		const circleDegCoof = 0.1;
+		const circleGap = 0.025;
+		const rot = -Math.PI/Math.PI;
+		const segCount = W/2;
+		const pi2 = Math.PI*2;
+		const tailOutCoof = 1.5;
+		const tailInCoof = 0.4;
+		const canCoof = 1.2;
+		
+		let canvas = document.querySelector('#c');
+		canvas.width = W*canCoof;
+		canvas.height = W*canCoof;
+		
+		let ctx = canvas.getContext('2d');
+		let center = {x:W*canCoof/2, y: W*canCoof/2};
+		
+		//circle();
+		//square();
+		//pulse();
+		draw();
+		
+		function draw(){
+			startDraw();
+			
+			circle();
+			pulse();
+			circle(1-circleDegCoof);
+			
+			endDraw();
+		}
+		
+		function circle(coof){
+			if(coof == undefined)
+				coof = 1;
+			
+			let i=0;
+			do{
+				let ang = getAngle(i/segCount);
+				let pt = getPoint(ang, coof);
+				let cx = pt.x;
+				let cy = pt.y;
+				if(!i){
+					ctx.moveTo(cx, cy);
+					continue;
+				}
+				ctx.lineTo(cx, cy);
+			}while(i++<segCount)
+		}
+		function pulse(){
+			let fPt = getPoint(getAngle(0), 1-circleDegCoof);
+			let lPt = getPoint(getAngle(1));
+			
+			let gapPoint = getGapPoint();
+			
+			let outPt = {x: gapPoint.x*tailOutCoof, y: gapPoint.y*tailOutCoof};
+			let inPt = {x: gapPoint.x*tailInCoof, y: gapPoint.y*tailInCoof};
+			
+			//ctx.moveTo(fPt.x, fPt.y);
+			ctx.lineTo(outPt.x, outPt.y);
+			ctx.lineTo(inPt.x, inPt.y);
+			ctx.lineTo(fPt.x, fPt.y);
+		}
+		
+		function square(){
+			ctx.save();
+			ctx.translate(center.x, center.y);
+			ctx.beginPath();
+			ctx.moveTo(-radius, -radius);
+			ctx.lineTo(radius, -radius);
+			ctx.lineTo(radius, radius);
+			ctx.lineTo(-radius, radius);
+			ctx.closePath();
+			ctx.stroke();
+			ctx.restore();
+		}
+		
+		//////////////////////////////////////////////////////////////////
+		function startDraw(){
+			ctx.save();
+			ctx.translate(center.x, center.y);
+			ctx.rotate(rot)
+			ctx.strokeStyle = color;
+			ctx.lineWidth = thick;
+			ctx.beginPath();
+		}
+		function endDraw(){
+			//ctx.closePath();
+			ctx.stroke();
+			ctx.restore();
+		}
+		function getPoint(ang, coof){
+			return { x:Math.sin(ang)*calcCircleDeg(ang, coof), y: Math.cos(ang)*calcCircleDeg(ang, coof) };
+		}
+		function getAngle(coof){
+			return pi2*(1-circleGap)*coof;
+		}
+		function calcCircleDeg(ang, coof){
+			if(coof == undefined)
+				coof = 1;
+			return radius * coof - ang/pi2 * circleDegCoof/(Math.PI/2) * radius;
+		}
+		function getGapPoint(){
+			let fPt = getPoint(getAngle(0));
+			let lPt = getPoint(getAngle(1), 1-circleDegCoof);
+			return {x: (fPt.x+lPt.x)/2, y:(fPt.y+lPt.y)/2 };
+		}
+	})();
+	
+</script>
